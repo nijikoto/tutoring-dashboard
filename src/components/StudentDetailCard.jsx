@@ -12,7 +12,13 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
   const [newLinkUrl, setNewLinkUrl] = useState('')
   const [savingPage, setSavingPage] = useState(false)
   const [savingLinks, setSavingLinks] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [closing, setClosing] = useState(false)
+
+  function showSaveError(msg) {
+    setSaveError(msg)
+    setTimeout(() => setSaveError(''), 3000)
+  }
 
   const thisYear = new Date().getFullYear()
   const yearCount = logs.filter(l => new Date(l.time).getFullYear() === thisYear).length
@@ -37,14 +43,24 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
 
   async function handleSavePage() {
     setSavingPage(true)
-    try { await onSave({ textbook_page: editPage }) } finally { setSavingPage(false) }
+    try {
+      await onSave({ textbook_page: editPage })
+    } catch {
+      showSaveError('儲存失敗，請重試')
+    } finally {
+      setSavingPage(false)
+    }
   }
 
   async function saveLinks(nextLinks) {
     setSavingLinks(true)
     try {
       await onSave({ gamma_link_1: nextLinks[0] || '', gamma_link_2: nextLinks[1] || '' })
-    } finally { setSavingLinks(false) }
+    } catch {
+      showSaveError('連結儲存失敗，請重試')
+    } finally {
+      setSavingLinks(false)
+    }
   }
 
   async function handleDeleteLink(idx) {
@@ -188,6 +204,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
                 )}
               </div>
             </div>
+          {saveError && <div className="detail-save-error">{saveError}</div>}
           </div>
 
           <div className="detail-divider-v"></div>
