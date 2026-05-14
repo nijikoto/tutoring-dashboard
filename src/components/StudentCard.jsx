@@ -1,8 +1,6 @@
-import { useState } from 'react'
 import { formatDT } from '../utils/date'
 
-export default function StudentCard({ student, logs, onRecord, disabled }) {
-  const [open, setOpen] = useState(false)
+export default function StudentCard({ student, logs, onRecord, disabled, open, onToggle }) {
 
   const total = logs.length
   const cyclePos = total % 4
@@ -16,7 +14,7 @@ export default function StudentCard({ student, logs, onRecord, disabled }) {
 
   return (
     <div className={'student-card' + (open ? ' card-open' : '')}>
-      <div className="card-header" onClick={() => setOpen(o => !o)}>
+      <div className="card-header" onClick={onToggle}>
         <div className="card-top">
           <div className="avatar" style={{ background: student.avatar_color }}>
             {student.initials}

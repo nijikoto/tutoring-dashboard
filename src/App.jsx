@@ -15,6 +15,15 @@ export default function App() {
   const [toast, setToast] = useState('')
   const [syncing, setSyncing] = useState(false)
   const [recording, setRecording] = useState(new Set())
+  const [openCards, setOpenCards] = useState(new Set())
+
+  function toggleCard(sid) {
+    setOpenCards(prev => {
+      const next = new Set(prev)
+      next.has(sid) ? next.delete(sid) : next.add(sid)
+      return next
+    })
+  }
 
   useEffect(() => { syncData() }, [])
 
@@ -104,7 +113,7 @@ export default function App() {
       <div style={{ padding: '0 20px 12px', maxWidth: '1100px', margin: '0 auto' }}>
         <div className="section-title">學生管理</div>
       </div>
-      <CardsGrid students={students} logs={logs} onRecord={recordClass} recording={recording} />
+      <CardsGrid students={students} logs={logs} onRecord={recordClass} recording={recording} openCards={openCards} onToggle={toggleCard} />
       <Toast msg={toast} />
     </>
   )
