@@ -11,6 +11,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
   const [newLinkUrl, setNewLinkUrl] = useState('')
   const [savingPage, setSavingPage] = useState(false)
   const [savingLinks, setSavingLinks] = useState(false)
+  const [closing, setClosing] = useState(false)
 
   const thisYear = new Date().getFullYear()
   const yearCount = logs.filter(l => new Date(l.time).getFullYear() === thisYear).length
@@ -18,15 +19,20 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
   const filledLinks = links.filter(Boolean)
   const canAddLink = filledLinks.length < 2
 
+  function handleClose() {
+    setClosing(true)
+    setTimeout(() => onClose(), 180)
+  }
+
   useEffect(() => {
     document.body.style.overflow = 'hidden'
-    function onKeyDown(e) { if (e.key === 'Escape') onClose() }
+    function onKeyDown(e) { if (e.key === 'Escape') handleClose() }
     document.addEventListener('keydown', onKeyDown)
     return () => {
       document.body.style.overflow = ''
       document.removeEventListener('keydown', onKeyDown)
     }
-  }, [onClose])
+  }, [])
 
   async function handleSavePage() {
     setSavingPage(true)
@@ -57,8 +63,8 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
   }
 
   return (
-    <div className="detail-overlay" onClick={onClose}>
-      <div className="detail-card" onClick={e => e.stopPropagation()}>
+    <div className={'detail-overlay' + (closing ? ' closing' : '')} onClick={handleClose}>
+      <div className={'detail-card' + (closing ? ' closing' : '')} onClick={e => e.stopPropagation()}>
 
         {/* Header */}
         <div className="detail-header">
@@ -74,7 +80,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
               </div>
             )}
           </div>
-          <button className="detail-close-btn" onClick={onClose}>
+          <button className="detail-close-btn" onClick={handleClose}>
             <i className="ti ti-x"></i>
           </button>
         </div>

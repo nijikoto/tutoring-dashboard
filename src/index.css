@@ -476,12 +476,43 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  animation: detailScaleIn 0.18s ease;
+  transform-origin: top center;
+  animation: detailScaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes detailScaleIn {
-  from { opacity: 0; transform: scale(0.94); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: perspective(800px) rotateX(-28deg) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(800px) rotateX(0deg) scale(1);
+  }
+}
+
+@keyframes detailScaleOut {
+  from {
+    opacity: 1;
+    transform: perspective(800px) rotateY(0deg) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: perspective(800px) rotateY(28deg) scale(0.95);
+  }
+}
+
+@keyframes detailFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.detail-overlay.closing {
+  animation: detailFadeOut 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.detail-card.closing {
+  animation: detailScaleOut 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 .detail-header {
