@@ -765,7 +765,21 @@ body {
 
 .detail-add-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
 
-.detail-log-list { display: flex; flex-direction: column; margin-bottom: 12px; }
+.detail-record-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.detail-record-row .cal-wrap { flex-shrink: 0; }
+
+.detail-log-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-bottom: 12px;
+}
 
 .detail-log-item {
   display: flex;

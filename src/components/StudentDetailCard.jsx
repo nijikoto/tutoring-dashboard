@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { formatDateOnly } from '../utils/date'
+import { formatDateOnly, formatDT } from '../utils/date'
 import SessionCalendar from './SessionCalendar'
 
 export default function StudentDetailCard({ student, logs, onClose, onSave }) {
@@ -197,7 +197,25 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
             <div className="detail-section-title">
               <i className="ti ti-calendar"></i> 上課紀錄
             </div>
-            <SessionCalendar logs={logs} schedule={student.schedule} />
+            <div className="detail-record-row">
+              <SessionCalendar logs={logs} schedule={student.schedule} />
+              <div className="detail-log-list">
+                {recentLogs.length === 0 ? (
+                  <div className="no-log">尚無上課紀錄</div>
+                ) : recentLogs.map(l => {
+                  const isPay = l.session_number % 4 === 0
+                  return (
+                    <div key={l.session_number} className="detail-log-item">
+                      <span className="log-num">{l.session_number}</span>
+                      <span className="log-date">{formatDT(l.time)}</span>
+                      <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
+                        {isPay ? '收費' : '第 ' + l.cyclePos + ' 堂'}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
 
             {student.meet_link && (
               <button className="detail-meet-btn" style={{ marginTop: '16px' }} onClick={() => window.open(student.meet_link, '_blank')}>

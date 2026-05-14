@@ -79,7 +79,7 @@ export default function SessionCalendar({ logs, schedule }) {
 
       <div className="cal-legend">
         <div className="cal-legend-item">
-          <div className="cal-legend-dot" style={{ background: 'rgba(255,255,255,0.7)' }} /> Regular
+          <div className="cal-legend-dot" style={{ background: '#ffd14d' }} /> Regular
         </div>
         {scheduledDay !== null && (
           <div className="cal-legend-item">
