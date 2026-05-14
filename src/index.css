@@ -778,6 +778,106 @@ body {
 
 .detail-log-item:last-child { border-bottom: none; }
 
+/* ── Session Calendar ── */
+.cal-wrap { width: 100%; max-width: 260px; }
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cal-nav-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.cal-nav-btn:hover { color: #fff; }
+
+.cal-month {
+  font-family: 'Khand', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.85);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-dow {
+  text-align: center;
+  font-family: 'Khand', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.5);
+  padding-bottom: 6px;
+}
+
+.cal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.cal-day {
+  font-family: 'Khand', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.25);
+  line-height: 1;
+}
+
+.cal-cell.has-session .cal-day { color: rgba(255,255,255,0.85); }
+.cal-cell.today { background: rgba(255,255,255,0.08); }
+.cal-cell.today .cal-day { color: #fff; }
+
+.cal-dot {
+  width: 70%;
+  height: 3px;
+  border-radius: 2px;
+  margin-top: 4px;
+  background: #ffd14d;
+}
+
+.cal-dot.makeup { background: rgba(255,182,210,0.9); }
+
+.cal-legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.cal-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Khand', sans-serif;
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.5px;
+}
+
+.cal-legend-dot {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
 .detail-meet-btn {
   align-self: flex-start;
   background: transparent;
