@@ -18,8 +18,10 @@ export async function postLog(payload) {
 }
 
 export async function postEmail(payload) {
-  await fetch(API, {
+  const res = await fetch(API, {
     method: 'POST',
     body: JSON.stringify({ action: 'sendEmail', ...payload }),
   })
+  const data = await res.json()
+  if (!data.success) throw new Error(data.error)
 }
