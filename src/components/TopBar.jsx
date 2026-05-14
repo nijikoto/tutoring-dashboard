@@ -1,11 +1,12 @@
+import { NotebookPen } from 'lucide-react'
 import ThemePicker from './ThemePicker'
 
 export default function TopBar({ onSync, syncing }) {
   return (
     <div className="top-bar">
       <div className="brand">
-        <div className="brand-icon"><i className="ti ti-school"></i></div>
-        TutorFee
+        <div className="brand-icon"><NotebookPen size={14} /></div>
+        Tutoring Dashboard
       </div>
       <div className="top-bar-actions">
         <button className="sync-btn" onClick={onSync} disabled={syncing}>

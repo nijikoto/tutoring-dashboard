@@ -11,7 +11,7 @@ const PRESETS = [
 ]
 
 const DEFAULT_THEME = PRESETS[0]
-const STORAGE_KEY = 'tutorfee-theme'
+const STORAGE_KEY = 'tutoring-dashboard-theme'
 
 function applyTheme(theme) {
   document.documentElement.style.setProperty('--bg', theme.bg)

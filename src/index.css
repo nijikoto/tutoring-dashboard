@@ -51,10 +51,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.brand-icon i {
-  font-size: 13px;
   color: var(--red);
 }
 
