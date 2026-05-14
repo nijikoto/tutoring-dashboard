@@ -77,6 +77,132 @@ body {
 .sync-btn:hover { background: rgba(255,255,255,0.25); }
 .sync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Theme Picker ── */
+.theme-picker { position: relative; }
+
+.theme-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.theme-btn:hover { background: rgba(255,255,255,0.25); }
+.theme-btn i { font-size: 16px; }
+
+.theme-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.9);
+}
+
+.theme-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: rgba(20,10,10,0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 14px;
+  z-index: 200;
+  min-width: 190px;
+}
+
+.theme-panel-title {
+  font-family: 'Khand', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 10px;
+}
+
+.theme-swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.swatch {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s;
+}
+
+.swatch:hover { transform: scale(1.1); }
+
+.swatch.active {
+  border: 2px solid #fff;
+  outline: 2px solid rgba(255,255,255,0.35);
+  outline-offset: 1px;
+}
+
+.theme-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-swatch {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255,255,255,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.custom-swatch:hover { border-color: rgba(255,255,255,0.7); }
+
+.custom-swatch input[type="color"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0;
+}
+
+.custom-plus {
+  font-size: 20px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1;
+  pointer-events: none;
+}
+
 /* ── Clock ── */
 .clock-section {
   text-align: center;

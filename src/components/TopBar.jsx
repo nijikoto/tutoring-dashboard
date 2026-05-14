@@ -1,3 +1,5 @@
+import ThemePicker from './ThemePicker'
+
 export default function TopBar({ onSync, syncing }) {
   return (
     <div className="top-bar">
@@ -5,9 +7,12 @@ export default function TopBar({ onSync, syncing }) {
         <div className="brand-icon"><i className="ti ti-school"></i></div>
         TutorFee
       </div>
-      <button className="sync-btn" onClick={onSync} disabled={syncing}>
-        <i className="ti ti-refresh"></i> 同步
-      </button>
+      <div className="top-bar-actions">
+        <button className="sync-btn" onClick={onSync} disabled={syncing}>
+          <i className="ti ti-refresh"></i> 同步
+        </button>
+        <ThemePicker />
+      </div>
     </div>
   )
 }
