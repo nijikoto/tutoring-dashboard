@@ -3,8 +3,9 @@ import TopBar from './components/TopBar'
 import Clock from './components/Clock'
 import StatusBar from './components/StatusBar'
 import CardsGrid from './components/CardsGrid'
+import StudentDetailCard from './components/StudentDetailCard'
 import Toast from './components/Toast'
-import { fetchData, postLog, postEmail } from './api/sheets'
+import { fetchData, postLog, postEmail, postUpdateStudent } from './api/sheets'
 import { buildEmail } from './utils/email'
 import { formatDate } from './utils/date'
 
@@ -16,6 +17,15 @@ export default function App() {
   const [syncing, setSyncing] = useState(false)
   const [recording, setRecording] = useState(new Set())
   const [openCards, setOpenCards] = useState(new Set())
+  const [activeStudent, setActiveStudent] = useState(null)
+
+  function openDetail(sid) { setActiveStudent(sid) }
+  function closeDetail() { setActiveStudent(null) }
+
+  async function updateStudent(sid, updates) {
+    await postUpdateStudent({ student_id: sid, ...updates })
+    setStudents(prev => prev.map(s => s.student_id === sid ? { ...s, ...updates } : s))
+  }
 
   function toggleCard(sid) {
     setOpenCards(prev => {
@@ -117,7 +127,15 @@ export default function App() {
       <div style={{ padding: '0 20px 12px', maxWidth: '1100px', margin: '0 auto' }}>
         <div className="section-title">學生管理</div>
       </div>
-      <CardsGrid students={students} logs={logs} onRecord={recordClass} recording={recording} openCards={openCards} onToggle={toggleCard} />
+      <CardsGrid students={students} logs={logs} onRecord={recordClass} recording={recording} openCards={openCards} onToggle={toggleCard} onOpenDetail={openDetail} />
+      {activeStudent && (
+        <StudentDetailCard
+          student={students.find(s => s.student_id === activeStudent)}
+          logs={logs[activeStudent] || []}
+          onClose={closeDetail}
+          onSave={(updates) => updateStudent(activeStudent, updates)}
+        />
+      )}
       <Toast msg={toast} />
     </>
   )

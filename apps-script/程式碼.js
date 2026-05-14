@@ -53,6 +53,25 @@ function doPost(e) {
       return res({ success: true });
     }
 
+    if (body.action === 'updateStudent') {
+      const sheet = ss.getSheetByName(SHEET_STUDENTS);
+      const rows = sheet.getDataRange().getValues();
+      const headers = rows[0];
+      const idCol = headers.indexOf('student_id');
+      const pageCol = headers.indexOf('textbook_page');
+      const link1Col = headers.indexOf('gamma_link_1');
+      const link2Col = headers.indexOf('gamma_link_2');
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][idCol]) === String(body.student_id)) {
+          if (body.textbook_page !== undefined) sheet.getRange(i + 1, pageCol + 1).setValue(body.textbook_page);
+          if (body.gamma_link_1 !== undefined) sheet.getRange(i + 1, link1Col + 1).setValue(body.gamma_link_1);
+          if (body.gamma_link_2 !== undefined) sheet.getRange(i + 1, link2Col + 1).setValue(body.gamma_link_2);
+          return res({ success: true });
+        }
+      }
+      return res({ success: false, error: 'Student not found' });
+    }
+
     return res({ success: false, error: 'Unknown action' });
   } catch(err) {
     return res({ success: false, error: err.message });

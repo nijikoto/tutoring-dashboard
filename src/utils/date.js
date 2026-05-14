@@ -1,3 +1,10 @@
+export function formatDateOnly(val) {
+  if (!val) return '—'
+  const s = String(val)
+  const dateStr = s.includes('T') ? s.substring(0, 10) : s
+  return dateStr.replace(/-/g, ' / ')
+}
+
 export function formatDate(iso) {
   const d = new Date(iso)
   return (

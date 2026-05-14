@@ -1,0 +1,205 @@
+import { useState, useEffect } from 'react'
+import { formatDT, formatDateOnly } from '../utils/date'
+
+export default function StudentDetailCard({ student, logs, onClose, onSave }) {
+  const [editPage, setEditPage] = useState(student.textbook_page ?? '')
+  const [links, setLinks] = useState([
+    student.gamma_link_1 || '',
+    student.gamma_link_2 || '',
+  ])
+  const [addingLink, setAddingLink] = useState(false)
+  const [newLinkUrl, setNewLinkUrl] = useState('')
+  const [savingPage, setSavingPage] = useState(false)
+  const [savingLinks, setSavingLinks] = useState(false)
+
+  const thisYear = new Date().getFullYear()
+  const yearCount = logs.filter(l => new Date(l.time).getFullYear() === thisYear).length
+  const recentLogs = [...logs].slice(-8).reverse()
+  const filledLinks = links.filter(Boolean)
+  const canAddLink = filledLinks.length < 2
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    function onKeyDown(e) { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.body.style.overflow = ''
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [onClose])
+
+  async function handleSavePage() {
+    setSavingPage(true)
+    try { await onSave({ textbook_page: editPage }) } finally { setSavingPage(false) }
+  }
+
+  async function saveLinks(nextLinks) {
+    setSavingLinks(true)
+    try {
+      await onSave({ gamma_link_1: nextLinks[0] || '', gamma_link_2: nextLinks[1] || '' })
+    } finally { setSavingLinks(false) }
+  }
+
+  async function handleDeleteLink(idx) {
+    const next = links.map((l, i) => i === idx ? '' : l)
+    setLinks(next)
+    await saveLinks(next)
+  }
+
+  async function handleAddLink() {
+    if (!newLinkUrl.trim()) return
+    const emptyIdx = links.findIndex(l => !l)
+    const next = links.map((l, i) => i === emptyIdx ? newLinkUrl.trim() : l)
+    setLinks(next)
+    setNewLinkUrl('')
+    setAddingLink(false)
+    await saveLinks(next)
+  }
+
+  return (
+    <div className="detail-overlay" onClick={onClose}>
+      <div className="detail-card" onClick={e => e.stopPropagation()}>
+
+        {/* Header */}
+        <div className="detail-header">
+          <div className="avatar detail-avatar" style={{ background: student.avatar_color }}>
+            {student.initials}
+          </div>
+          <div className="detail-header-info">
+            <div className="detail-name">{student.name}</div>
+            <div className="course-name">{student.course}</div>
+            {student.schedule && (
+              <div className="schedule-tag">
+                <i className="ti ti-clock"></i> {student.schedule}
+              </div>
+            )}
+          </div>
+          <button className="detail-close-btn" onClick={onClose}>
+            <i className="ti ti-x"></i>
+          </button>
+        </div>
+
+        <hr className="detail-divider" />
+
+        {/* Two columns */}
+        <div className="detail-two-col">
+
+          {/* Left */}
+          <div className="detail-col">
+            <div className="detail-section-title">
+              <i className="ti ti-info-circle"></i> 基本資料
+            </div>
+            <div className="detail-info-grid">
+              <div className="detail-info-block">
+                <div className="detail-info-label">開始上課日</div>
+                <div className="detail-info-value">{formatDateOnly(student.start_date)}</div>
+              </div>
+              <div className="detail-info-block">
+                <div className="detail-info-label">今年累積堂數</div>
+                <div className="detail-info-value accent">{yearCount} 堂</div>
+              </div>
+              <div className="detail-info-block full">
+                <div className="detail-info-label">課本進度</div>
+                <div className="detail-progress-row">
+                  <span className="detail-muted">{student.textbook || '—'}　第</span>
+                  <input
+                    className="detail-page-input"
+                    type="number"
+                    value={editPage}
+                    min={1}
+                    onChange={e => setEditPage(e.target.value)}
+                  />
+                  <span className="detail-muted">頁</span>
+                  <button className="detail-save-btn" onClick={handleSavePage} disabled={savingPage}>
+                    <i className="ti ti-device-floppy"></i>
+                    {savingPage ? '儲存中' : '儲存'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '20px' }}>
+              <div className="detail-section-title">
+                <i className="ti ti-presentation"></i> 白板連結
+              </div>
+              <div className="detail-gamma-list">
+                {links.map((link, i) =>
+                  link ? (
+                    <div key={i} className="detail-gamma-item">
+                      <div className="detail-gamma-link">
+                        <i className="ti ti-link"></i>
+                        <span>{link}</span>
+                      </div>
+                      <button className="detail-icon-btn btn-link" onClick={() => window.open(link, '_blank')}>
+                        <i className="ti ti-external-link"></i>
+                      </button>
+                      <button className="detail-icon-btn btn-delete" onClick={() => handleDeleteLink(i)} disabled={savingLinks}>
+                        <i className="ti ti-trash"></i>
+                      </button>
+                    </div>
+                  ) : null
+                )}
+
+                {addingLink ? (
+                  <div className="detail-gamma-item">
+                    <input
+                      className="detail-link-input"
+                      type="url"
+                      placeholder="貼上連結..."
+                      value={newLinkUrl}
+                      onChange={e => setNewLinkUrl(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleAddLink()}
+                      autoFocus
+                    />
+                    <button className="detail-icon-btn btn-link" onClick={handleAddLink}>
+                      <i className="ti ti-check"></i>
+                    </button>
+                    <button className="detail-icon-btn btn-delete" onClick={() => { setAddingLink(false); setNewLinkUrl('') }}>
+                      <i className="ti ti-x"></i>
+                    </button>
+                  </div>
+                ) : canAddLink && (
+                  <button className="detail-add-btn" onClick={() => setAddingLink(true)}>
+                    <i className="ti ti-plus"></i> 新增白板
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="detail-divider-v"></div>
+
+          {/* Right */}
+          <div className="detail-col">
+            <div className="detail-section-title">
+              <i className="ti ti-calendar"></i> 上課紀錄（近 8 堂）
+            </div>
+            <div className="detail-log-list">
+              {recentLogs.length === 0 ? (
+                <div className="no-log">尚無上課紀錄</div>
+              ) : recentLogs.map(l => {
+                const isPay = l.session_number % 4 === 0
+                return (
+                  <div key={l.session_number} className="detail-log-item">
+                    <span className="log-num">{l.session_number}</span>
+                    <span className="log-date">{formatDT(l.time)}</span>
+                    <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
+                      {isPay ? '收費' : '第 ' + l.cyclePos + ' 堂'}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+
+            {student.meet_link && (
+              <button className="detail-meet-btn" onClick={() => window.open(student.meet_link, '_blank')}>
+                <i className="ti ti-video"></i> Google Meet
+              </button>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}

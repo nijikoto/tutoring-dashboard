@@ -1,6 +1,6 @@
 import StudentCard from './StudentCard'
 
-export default function CardsGrid({ students, logs, onRecord, recording, openCards, onToggle }) {
+export default function CardsGrid({ students, logs, onRecord, recording, openCards, onToggle, onOpenDetail }) {
   return (
     <div className="cards-grid">
       {students.map(s => (
@@ -12,6 +12,7 @@ export default function CardsGrid({ students, logs, onRecord, recording, openCar
           disabled={recording.has(s.student_id)}
           open={openCards.has(s.student_id)}
           onToggle={() => onToggle(s.student_id)}
+          onOpenDetail={() => onOpenDetail(s.student_id)}
         />
       ))}
     </div>

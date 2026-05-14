@@ -1,6 +1,6 @@
 import { formatDT } from '../utils/date'
 
-export default function StudentCard({ student, logs, onRecord, disabled, open, onToggle }) {
+export default function StudentCard({ student, logs, onRecord, disabled, open, onToggle, onOpenDetail }) {
 
   const total = logs.length
   const cyclePos = total % 4
@@ -16,7 +16,11 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
     <div className={'student-card' + (open ? ' card-open' : '')}>
       <div className="card-header" onClick={onToggle}>
         <div className="card-top">
-          <div className="avatar" style={{ background: student.avatar_color }}>
+          <div
+            className="avatar"
+            style={{ background: student.avatar_color, cursor: 'pointer' }}
+            onClick={e => { e.stopPropagation(); onOpenDetail() }}
+          >
             {student.initials}
           </div>
           <div className="student-info">
