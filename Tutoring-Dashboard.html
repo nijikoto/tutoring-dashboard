@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TutorFee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --red:#c7534b;--bg:#ba4a43;--card:rgba(0,0,0,0.18);
+  --card-hover:rgba(0,0,0,0.25);--txt:#fff;--muted:rgba(255,255,255,0.65);
+  --border:rgba(255,255,255,0.15);--btn:#fff;--btn-txt:#b94040;
+}
+body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:var(--txt);min-height:100vh;padding-bottom:2rem;}
+.top-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 10px;border-bottom:1px solid var(--border);}
+.brand{display:flex;align-items:center;gap:8px;font-family:'Khand',sans-serif;font-size:20px;font-weight:700;letter-spacing:0.5px;}
+.brand-icon{width:22px;height:22px;background:var(--btn);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.brand-icon i{font-size:13px;color:var(--red);}
+.sync-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 12px;border-radius:20px;font-family:'Khand',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background 0.2s;}
+.sync-btn:hover{background:rgba(255,255,255,0.25);}
+.sync-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.clock-section{text-align:center;padding:22px 0 16px;}
+#live-clock{font-family:'Khand',sans-serif;font-size:72px;font-weight:600;letter-spacing:4px;line-height:1;}
+.clock-date{font-size:13px;color:var(--muted);margin-top:4px;letter-spacing:1px;}
+.status-bar{text-align:center;font-size:12px;color:var(--muted);margin-bottom:12px;font-family:'Khand',sans-serif;letter-spacing:1px;min-height:18px;}
+.status-bar.ok{color:rgba(150,255,180,0.8);}
+.status-bar.err{color:rgba(255,180,150,0.9);}
+.section-title{text-align:center;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;font-family:'Khand',sans-serif;font-weight:500;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:0 20px;max-width:1100px;margin:0 auto;}
+.student-card{background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;transition:background 0.2s;}
+.student-card:hover{background:var(--card-hover);}
+.card-header{padding:14px 14px 10px;cursor:pointer;user-select:none;}
+.card-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Khand',sans-serif;font-size:17px;font-weight:700;flex-shrink:0;border:2px solid rgba(255,255,255,0.2);color:#fff;}
+.student-info{flex:1;min-width:0;}
+.student-name{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.course-name{font-size:11px;color:var(--muted);margin-top:1px;}
+.chevron{font-size:14px;color:var(--muted);transition:transform 0.25s;flex-shrink:0;}
+.card-open .chevron{transform:rotate(180deg);}
+.progress-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.dots{display:flex;gap:5px;}
+.dot{width:10px;height:10px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:transparent;transition:background 0.2s,border-color 0.2s;}
+.dot.filled{background:rgba(255,255,255,0.9);border-color:rgba(255,255,255,0.9);}
+.dot.pay-alert{background:#ffd14d;border-color:#ffd14d;}
+.count-label{font-size:12px;color:var(--muted);margin-left:auto;font-family:'Khand',sans-serif;font-weight:500;}
+.start-btn{width:100%;padding:9px 0;background:var(--btn);color:var(--btn-txt);border:none;border-radius:8px;font-family:'Khand',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:background 0.15s,transform 0.1s;}
+.start-btn:hover{background:#fff;}
+.start-btn:active{transform:scale(0.97);}
+.start-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.start-btn.pay-mode{background:#ffd14d;color:#7a5000;}
+.start-btn.pay-mode:hover{background:#ffe07a;}
+.accordion-body{max-height:0;overflow:hidden;transition:max-height 0.3s ease;}
+.accordion-inner{padding:10px 14px 12px;border-top:1px solid var(--border);}
+.history-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Khand',sans-serif;}
+.log-item{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:12px;}
+.log-item:last-child{border-bottom:none;}
+.log-num{font-family:'Khand',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,0.5);width:20px;flex-shrink:0;}
+.log-date{color:var(--muted);flex:1;padding-left:6px;}
+.log-badge{font-size:10px;padding:2px 7px;border-radius:20px;font-family:'Khand',sans-serif;font-weight:600;letter-spacing:0.5px;}
+.badge-normal{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);}
+.badge-pay{background:#ffd14d;color:#7a5000;}
+.no-log{font-size:12px;color:var(--muted);text-align:center;padding:8px 0;font-style:italic;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(20,10,10,0.92);color:#ffd14d;font-family:'Khand',sans-serif;font-size:15px;font-weight:600;padding:10px 22px;border-radius:24px;border:1px solid rgba(255,209,77,0.3);letter-spacing:0.5px;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;white-space:nowrap;z-index:999;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-school"></i></div>
+    TutorFee
+  </div>
+  <button class="sync-btn" onclick="syncData()" id="sync-btn">
+    <i class="ti ti-refresh"></i> 同步
+  </button>
+</div>
+
+<div class="clock-section">
+  <div id="live-clock">00:00:00</div>
+  <div class="clock-date" id="clock-date"></div>
+</div>
+
+<div class="status-bar" id="status-bar">連接中...</div>
+
+<div style="padding:0 20px 12px;max-width:1100px;margin:0 auto;">
+  <div class="section-title">學生管理</div>
+</div>
+
+<div class="cards-grid" id="cards-grid"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbw3JYFhA-1rsXTX814NpWhxF__4sirX6ECwmSqEdhJlBiWWo7npvCpGWUR_aGoA5c0tsg/exec';
+
+let students = [];
+let logs = {};
+
+// ── 信件模板 ──────────────────────────────────────────
+function buildEmail(student, dates, total) {
+  const isJapanese = student.course === '日文課';
+
+  if (isJapanese) {
+    const dateLines = dates.map(d => `　・${d}`).join('\n');
+    return {
+      subject: `【授業料のお知らせ】${student.name}さん`,
+      body:
+`${student.name}さん、こんにちは！
+
+今期の授業が4回完了しましたので、授業料のお知らせをお送りします。
+
+【受講日】
+${dateLines}
+
+【授業料】
+　単価：NT$${Number(student.price).toLocaleString()} × 4回
+　合計：NT$${total.toLocaleString()}
+
+お支払いの方法についてはご確認ください。
+ご不明な点がございましたら、お気軽にご連絡ください。
+
+どうぞよろしくお願いいたします。`
+    };
+  } else {
+    const dateLines = dates.map(d => `  - ${d}`).join('\n');
+    return {
+      subject: `[Tuition Payment] ${student.name}`,
+      body:
+`Hi ${student.name},
+
+We have completed 4 lessons this cycle. Here is your tuition summary:
+
+Lesson Dates:
+${dateLines}
+
+Tuition Fee:
+  NT$${Number(student.price).toLocaleString()} × 4 lessons = NT$${total.toLocaleString()}
+
+Please arrange the payment at your earliest convenience.
+Feel free to reach out if you have any questions!
+
+Best regards,`
+    };
+  }
+}
+// ─────────────────────────────────────────────────────
+
+function setStatus(msg, type) {
+  const el = document.getElementById('status-bar');
+  el.textContent = msg;
+  el.className = 'status-bar' + (type ? ' ' + type : '');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+}
+
+function formatDT(iso) {
+  const d = new Date(iso);
+  return formatDate(iso) + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+async function syncData() {
+  const btn = document.getElementById('sync-btn');
+  btn.disabled = true;
+  setStatus('同步中...');
+  try {
+    const res = await fetch(API + '?t=' + Date.now());
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    students = data.students;
+    logs = {};
+    students.forEach(s => logs[s.student_id] = []);
+
+    (data.sessions || []).forEach(row => {
+      const sid = row.student_id;
+      if (logs[sid] !== undefined) {
+        logs[sid].push({
+          time: row.timestamp,
+          cyclePos: Number(row.cycle_position),
+          session_number: Number(row.session_number)
+        });
+      }
+    });
+
+    students.forEach(s => {
+      logs[s.student_id].sort((a, b) => a.session_number - b.session_number);
+    });
+
+    renderAll();
+    setStatus('已同步 Google Sheets ✓', 'ok');
+  } catch(e) {
+    setStatus('同步失敗：' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function recordClass(sid) {
+  const s = students.find(x => x.student_id === sid);
+  const btn = document.getElementById('btn-' + sid);
+  if (btn) btn.disabled = true;
+
+  const studentLogs = logs[sid] || [];
+  const total = studentLogs.length;
+  const cyclePos = (total % 4) + 1;
+  const sessionNum = total + 1;
+  const now = new Date().toISOString();
+  const isPaySession = cyclePos === 4;
+
+  if (s.meet_link) window.open(s.meet_link, '_blank');
+
+  setStatus('記錄中...');
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'addLog',
+        student_id: sid,
+        session_number: sessionNum,
+        cycle_position: cyclePos,
+        timestamp: now,
+        is_pay_session: isPaySession
+      })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    logs[sid].push({ time: now, cyclePos, session_number: sessionNum });
+
+    if (isPaySession) {
+      await sendPaymentEmail(s, sid, sessionNum);
+      showToast('💰 ' + s.name + ' 第 ' + Math.ceil(sessionNum/4) + ' 週期完成，帳單已寄出！');
+    } else {
+      showToast('✓ ' + s.name + ' 第 ' + sessionNum + ' 堂已記錄');
+    }
+
+    renderCard(sid);
+    setStatus('已儲存至 Google Sheets ✓', 'ok');
+  } catch(e) {
+    setStatus('儲存失敗：' + e.message, 'err');
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function sendPaymentEmail(student, sid, lastSessionNum) {
+  const studentLogs = logs[sid] || [];
+  const startSession = lastSessionNum - 3;
+  const cycleLogs = studentLogs.filter(l => l.session_number >= startSession && l.session_number <= lastSessionNum);
+  cycleLogs.sort((a, b) => a.session_number - b.session_number);
+  const dates = cycleLogs.map(l => formatDate(l.time));
+  const total = Number(student.price) * 4;
+  const email = buildEmail(student, dates, total);
+
+  await fetch(API, {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'sendEmail',
+      to: student.email,
+      subject: email.subject,
+      body: email.body
+    })
+  });
+}
+
+function renderCard(sid) {
+  const s = students.find(x => x.student_id === sid);
+  const studentLogs = logs[sid] || [];
+  const total = studentLogs.length;
+  const cyclePos = total % 4;
+  const isPayTime = total > 0 && cyclePos === 0;
+  const card = document.getElementById('card-' + sid);
+  if (!card) return;
+  const wasOpen = card.classList.contains('card-open');
+
+  const dotsFilled = isPayTime ? 4 : cyclePos;
+  const dotsHtml = [1,2,3,4].map(i => {
+    if (isPayTime) return '<div class="dot pay-alert"></div>';
+    return '<div class="dot ' + (i <= dotsFilled ? 'filled' : '') + '"></div>';
+  }).join('');
+
+  const btnClass = isPayTime ? 'start-btn pay-mode' : 'start-btn';
+  const btnText = isPayTime ? '💰 已收費，開始新週期' : '▶ 開始上課';
+
+  const recentLogs = [...studentLogs].slice(-4);
+  const logsHtml = studentLogs.length === 0
+    ? '<div class="no-log">尚無上課紀錄</div>'
+    : recentLogs.reverse().map(l => {
+        const isPay = (l.session_number % 4 === 0);
+        return '<div class="log-item"><span class="log-num">' + l.session_number + '</span><span class="log-date">' + formatDT(l.time) + '</span><span class="log-badge ' + (isPay ? 'badge-pay' : 'badge-normal') + '">' + (isPay ? '收費' : '第 ' + l.cyclePos + ' 堂') + '</span></div>';
+      }).join('');
+
+  card.innerHTML =
+    '<div class="card-header" onclick="toggleCard(\'' + sid + '\')">' +
+      '<div class="card-top">' +
+        '<div class="avatar" style="background:' + s.avatar_color + '">' + s.initials + '</div>' +
+        '<div class="student-info"><div class="student-name">' + s.name + '</div><div class="course-name">' + s.course + '</div></div>' +
+        '<i class="ti ti-chevron-down chevron"></i>' +
+      '</div>' +
+      '<div class="progress-row"><div class="dots">' + dotsHtml + '</div><div class="count-label">共 ' + total + ' 堂</div></div>' +
+      '<button id="btn-' + sid + '" class="' + btnClass + '" onclick="event.stopPropagation();recordClass(\'' + sid + '\')">' + btnText + '</button>' +
+    '</div>' +
+    '<div class="accordion-body" id="body-' + sid + '">' +
+      '<div class="accordion-inner"><div class="history-title">上課紀錄（最近4堂）</div>' + logsHtml + '</div>' +
+    '</div>';
+
+  if (wasOpen) {
+    card.classList.add('card-open');
+    const body = document.getElementById('body-' + sid);
+    if (body) body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+function toggleCard(sid) {
+  const card = document.getElementById('card-' + sid);
+  const body = document.getElementById('body-' + sid);
+  if (!card || !body) return;
+  if (card.classList.contains('card-open')) {
+    card.classList.remove('card-open');
+    body.style.maxHeight = '0';
+  } else {
+    card.classList.add('card-open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+function renderAll() {
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+  students.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'student-card';
+    div.id = 'card-' + s.student_id;
+    grid.appendChild(div);
+    renderCard(s.student_id);
+  });
+}
+
+function updateClock() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  const el = document.getElementById('live-clock');
+  if (el) el.textContent = hh + ':' + mm + ':' + ss;
+  const days = ['日','一','二','三','四','五','六'];
+  const dateEl = document.getElementById('clock-date');
+  if (dateEl) dateEl.textContent = now.getFullYear() + ' / ' + String(now.getMonth()+1).padStart(2,'0') + ' / ' + String(now.getDate()).padStart(2,'0') + '  週' + days[now.getDay()];
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+syncData();
+</script>
+</body>
+</html>
