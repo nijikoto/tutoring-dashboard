@@ -690,6 +690,7 @@ body {
 }
 
 .detail-link-input::placeholder { color: var(--muted); }
+.detail-link-input:focus { border-color: rgba(255,255,255,0.5); }
 
 .detail-icon-btn {
   background: rgba(255,255,255,0.08);

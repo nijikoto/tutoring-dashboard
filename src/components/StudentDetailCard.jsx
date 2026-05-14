@@ -126,10 +126,26 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
                 {links.map((link, i) =>
                   link ? (
                     <div key={i} className="detail-gamma-item">
-                      <div className="detail-gamma-link">
-                        <i className="ti ti-link"></i>
-                        <span>{link}</span>
-                      </div>
+                      <input
+                        className="detail-link-input"
+                        type="url"
+                        value={link}
+                        onChange={e => {
+                          const next = links.map((l, idx) => idx === i ? e.target.value : l)
+                          setLinks(next)
+                        }}
+                        onBlur={e => {
+                          const next = links.map((l, idx) => idx === i ? e.target.value : l)
+                          saveLinks(next)
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            const next = links.map((l, idx) => idx === i ? e.target.value : l)
+                            saveLinks(next)
+                            e.target.blur()
+                          }
+                        }}
+                      />
                       <button className="detail-icon-btn btn-link" onClick={() => window.open(link, '_blank')}>
                         <i className="ti ti-external-link"></i>
                       </button>
