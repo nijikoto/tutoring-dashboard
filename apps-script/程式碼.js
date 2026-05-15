@@ -53,6 +53,23 @@ function doPost(e) {
       return res({ success: true });
     }
 
+    if (body.action === 'markPaymentReceived') {
+      const sheet = ss.getSheetByName(SHEET_SESSIONS);
+      const rows = sheet.getDataRange().getValues();
+      const headers = rows[0];
+      const idCol = headers.indexOf('student_id');
+      const sessionNumCol = headers.indexOf('session_number');
+      const payReceivedCol = headers.indexOf('payment_received_at');
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][idCol]) === String(body.student_id) &&
+            Number(rows[i][sessionNumCol]) === Number(body.session_number)) {
+          sheet.getRange(i + 1, payReceivedCol + 1).setValue(body.timestamp);
+          return res({ success: true });
+        }
+      }
+      return res({ success: false, error: 'Session not found' });
+    }
+
     if (body.action === 'updateStudent') {
       const sheet = ss.getSheetByName(SHEET_STUDENTS);
       const rows = sheet.getDataRange().getValues();

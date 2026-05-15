@@ -17,6 +17,15 @@ export async function postLog(payload) {
   return data
 }
 
+export async function postMarkPaymentReceived(payload) {
+  const res = await fetch(API, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'markPaymentReceived', ...payload }),
+  })
+  const data = await res.json()
+  if (!data.success) throw new Error(data.error)
+}
+
 export async function postUpdateStudent(payload) {
   const res = await fetch(API, {
     method: 'POST',

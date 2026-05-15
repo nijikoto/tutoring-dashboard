@@ -5,7 +5,7 @@ import StatusBar from './components/StatusBar'
 import CardsGrid from './components/CardsGrid'
 import StudentDetailCard from './components/StudentDetailCard'
 import Toast from './components/Toast'
-import { fetchData, postLog, postEmail, postUpdateStudent } from './api/sheets'
+import { fetchData, postLog, postEmail, postUpdateStudent, postMarkPaymentReceived } from './api/sheets'
 import { buildEmail } from './utils/email'
 import { formatDate } from './utils/date'
 
@@ -21,6 +21,20 @@ export default function App() {
 
   function openDetail(sid) { setActiveStudent(sid) }
   function closeDetail() { setActiveStudent(null) }
+
+  async function recordFeeReceived(sid) {
+    const studentLogs = logs[sid] || []
+    const lastPayLog = [...studentLogs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
+    if (!lastPayLog) return
+    const now = new Date().toISOString()
+    await postMarkPaymentReceived({ student_id: sid, session_number: lastPayLog.session_number, timestamp: now })
+    setLogs(prev => ({
+      ...prev,
+      [sid]: prev[sid].map(l =>
+        l.session_number === lastPayLog.session_number ? { ...l, paymentReceivedAt: now } : l
+      )
+    }))
+  }
 
   async function updateStudent(sid, updates) {
     await postUpdateStudent({ student_id: sid, ...updates })
@@ -51,6 +65,7 @@ export default function App() {
             cyclePos: Number(row.cycle_position),
             session_number: Number(row.session_number),
             isPay: row.is_pay_session,
+            paymentReceivedAt: row.payment_received_at || '',
           })
         }
       })
@@ -128,7 +143,7 @@ export default function App() {
       <div style={{ padding: '0 20px 12px', maxWidth: '1100px', margin: '0 auto' }}>
         <div className="section-title">學生管理</div>
       </div>
-      <CardsGrid students={students} logs={logs} onRecord={recordClass} recording={recording} openCards={openCards} onToggle={toggleCard} onOpenDetail={openDetail} />
+      <CardsGrid students={students} logs={logs} onRecord={recordClass} recording={recording} openCards={openCards} onToggle={toggleCard} onOpenDetail={openDetail} onFeeReceived={recordFeeReceived} />
       {activeStudent && (
         <StudentDetailCard
           student={students.find(s => s.student_id === activeStudent)}

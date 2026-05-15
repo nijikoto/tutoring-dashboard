@@ -1,10 +1,13 @@
-import { formatDT } from '../utils/date'
+import { formatDT, formatShort } from '../utils/date'
 
-export default function StudentCard({ student, logs, onRecord, disabled, open, onToggle, onOpenDetail }) {
+export default function StudentCard({ student, logs, onRecord, disabled, open, onToggle, onOpenDetail, onFeeReceived }) {
 
   const total = logs.length
   const lastCyclePos = total > 0 ? logs[total - 1].cyclePos : 0
   const isPayTime = total > 0 && lastCyclePos === 4
+
+  const lastPayLog = [...logs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
+  const feeReceived = !!(lastPayLog && lastPayLog.paymentReceivedAt)
 
   const dotsFilled = isPayTime ? 4 : lastCyclePos
   const btnClass = 'start-btn' + (isPayTime ? ' pay-mode' : '')
@@ -49,6 +52,20 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
         >
           {btnText}
         </button>
+
+        {isPayTime && (
+          feeReceived ? (
+            <div className="fee-received-status" onClick={e => e.stopPropagation()}>
+              <i className="ti ti-circle-check"></i>
+              <span>學費已收到</span>
+              <span className="fee-timestamp">{formatShort(lastPayLog.paymentReceivedAt)}</span>
+            </div>
+          ) : (
+            <button className="fee-btn" onClick={e => { e.stopPropagation(); onFeeReceived() }}>
+              <i className="ti ti-cash"></i> 收到學費
+            </button>
+          )
+        )}
       </div>
 
       <div className="accordion-body" style={{ maxHeight: open ? '500px' : '0' }}>

@@ -376,6 +376,54 @@ body {
 .start-btn.pay-mode { background: #ffd14d; color: #7a5000; }
 .start-btn.pay-mode:hover { background: #ffe07a; }
 
+.fee-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 0;
+  background: var(--btn);
+  color: var(--btn-txt);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Khand', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.fee-btn:hover  { background: #fff; }
+.fee-btn:active { transform: scale(0.97); }
+
+.fee-received-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  padding: 9px 12px;
+  background: var(--btn);
+  border-radius: 8px;
+  font-family: 'Khand', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #3a9e5f;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.fee-received-status i { font-size: 15px; }
+
+.fee-timestamp {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(0,0,0,0.4);
+  font-weight: 500;
+}
+
 /* ── Accordion ── */
 .accordion-body {
   max-height: 0;
