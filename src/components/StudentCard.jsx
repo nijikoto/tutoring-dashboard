@@ -3,12 +3,12 @@ import { formatDT } from '../utils/date'
 export default function StudentCard({ student, logs, onRecord, disabled, open, onToggle, onOpenDetail }) {
 
   const total = logs.length
-  const cyclePos = total % 4
-  const isPayTime = total > 0 && cyclePos === 0
+  const lastCyclePos = total > 0 ? logs[total - 1].cyclePos : 0
+  const isPayTime = total > 0 && lastCyclePos === 4
 
-  const dotsFilled = isPayTime ? 4 : cyclePos
+  const dotsFilled = isPayTime ? 4 : lastCyclePos
   const btnClass = 'start-btn' + (isPayTime ? ' pay-mode' : '')
-  const btnText = isPayTime ? '💰 已收費，開始新週期' : '▶ 開始上課'
+  const btnText = '▶ 開始上課'
 
   const recentLogs = [...logs].slice(-4).reverse()
 
@@ -64,7 +64,7 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
                   <span className="log-num">{l.session_number}</span>
                   <span className="log-date">{formatDT(l.time)}</span>
                   <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
-                    {isPay ? '收費' : '第 ' + l.cyclePos + ' 堂'}
+                    {'第 ' + l.cyclePos + ' 堂'}
                   </span>
                 </div>
               )

@@ -226,7 +226,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
                       <span className="log-num">{l.session_number}</span>
                       <span className="log-date">{formatDT(l.time)}</span>
                       <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
-                        {isPay ? '收費' : '第 ' + l.cyclePos + ' 堂'}
+                        {'第 ' + l.cyclePos + ' 堂'}
                       </span>
                     </div>
                   )

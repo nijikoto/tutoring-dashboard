@@ -70,9 +70,9 @@ export default function App() {
   async function recordClass(sid) {
     const student = students.find(x => x.student_id === sid)
     const studentLogs = logs[sid] || []
-    const total = studentLogs.length
-    const cyclePos = (total % 4) + 1
-    const sessionNum = total + 1
+    const lastLog = studentLogs.length > 0 ? studentLogs[studentLogs.length - 1] : null
+    const cyclePos = lastLog ? (lastLog.cyclePos % 4) + 1 : 1
+    const sessionNum = lastLog ? Math.max(...studentLogs.map(l => l.session_number)) + 1 : 1
     const now = new Date().toISOString()
     const isPaySession = cyclePos === 4
 
