@@ -50,6 +50,7 @@ export default function App() {
             time: row.timestamp,
             cyclePos: Number(row.cycle_position),
             session_number: Number(row.session_number),
+            isPay: row.is_pay_session,
           })
         }
       })
@@ -81,7 +82,7 @@ export default function App() {
     setStatus({ msg: '記錄中...', type: '' })
     try {
       await postLog({ student_id: sid, session_number: sessionNum, cycle_position: cyclePos, timestamp: now, is_pay_session: isPaySession })
-      const newLog = { time: now, cyclePos, session_number: sessionNum }
+      const newLog = { time: now, cyclePos, session_number: sessionNum, isPay: isPaySession }
       const updatedLogs = [...studentLogs, newLog]
       setLogs(prev => ({ ...prev, [sid]: updatedLogs }))
 

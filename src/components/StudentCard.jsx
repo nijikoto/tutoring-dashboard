@@ -58,7 +58,7 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
             <div className="no-log">尚無上課紀錄</div>
           ) : (
             recentLogs.map(l => {
-              const isPay = l.session_number % 4 === 0
+              const isPay = l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE'
               return (
                 <div key={l.session_number} className="log-item">
                   <span className="log-num">{l.session_number}</span>
