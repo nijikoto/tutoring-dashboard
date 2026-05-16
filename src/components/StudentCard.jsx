@@ -7,7 +7,8 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
   const isPayTime = total > 0 && lastCyclePos === 4
 
   const lastPayLog = [...logs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
-  const feeReceived = !!(lastPayLog && lastPayLog.paymentReceivedAt)
+  const feeReceived = !!(lastPayLog?.paymentReceivedAt)
+  const showFeeSection = feeReceived ? isPayTime : !!lastPayLog
 
   const dotsFilled = isPayTime ? 4 : lastCyclePos
   const btnClass = 'start-btn' + (isPayTime ? ' pay-mode' : '')
@@ -53,7 +54,7 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
           {btnText}
         </button>
 
-        {isPayTime && (
+        {showFeeSection && (
           feeReceived ? (
             <div className="fee-received-status" onClick={e => e.stopPropagation()}>
               <i className="ti ti-circle-check"></i>
