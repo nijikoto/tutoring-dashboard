@@ -102,12 +102,10 @@ export default function App() {
       setLogs(prev => ({ ...prev, [sid]: updatedLogs }))
 
       if (isPaySession) {
-        try {
-          await sendPaymentEmail(student, updatedLogs, sessionNum)
-          showToast('💰 ' + student.name + ' 第 ' + Math.ceil(sessionNum / 4) + ' 週期完成，帳單已寄出！')
-        } catch {
-          showToast('⚠️ 課堂已記錄，但帳單寄送失敗')
-        }
+        setTimeout(() => {
+          sendPaymentEmail(student, updatedLogs, sessionNum).catch(() => {})
+        }, 65 * 60 * 1000)
+        showToast('💰 ' + student.name + ' 第 ' + Math.ceil(sessionNum / 4) + ' 週期完成，帳單已排程寄出')
       } else {
         showToast('✓ ' + student.name + ' 第 ' + sessionNum + ' 堂已記錄')
       }
