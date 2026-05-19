@@ -1,3 +1,17 @@
+export function buildFeeReceivedEmail(student) {
+  return {
+    subject: `【授業料受領確認】${student.name}さん`,
+    body:
+`${student.name}さん
+
+お世話になっております。
+授業料のお支払いを確認いたしました。
+
+今月もレッスンにご参加いただき、ありがとうございました。
+また次回お会いしましょう。`,
+  }
+}
+
 export function buildEmail(student, dates, total) {
   const isJapanese = student.course === '日文課'
 

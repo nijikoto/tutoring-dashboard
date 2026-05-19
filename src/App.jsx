@@ -6,7 +6,7 @@ import CardsGrid from './components/CardsGrid'
 import StudentDetailCard from './components/StudentDetailCard'
 import Toast from './components/Toast'
 import { fetchData, postLog, postEmail, postUpdateStudent, postMarkPaymentReceived } from './api/sheets'
-import { buildEmail } from './utils/email'
+import { buildEmail, buildFeeReceivedEmail } from './utils/email'
 import { formatDate } from './utils/date'
 
 export default function App() {
@@ -23,6 +23,7 @@ export default function App() {
   function closeDetail() { setActiveStudent(null) }
 
   async function recordFeeReceived(sid) {
+    const student = students.find(s => s.student_id === sid)
     const studentLogs = logs[sid] || []
     const lastPayLog = [...studentLogs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
     if (!lastPayLog) return
@@ -34,6 +35,8 @@ export default function App() {
         l.session_number === lastPayLog.session_number ? { ...l, paymentReceivedAt: now } : l
       )
     }))
+    const email = buildFeeReceivedEmail(student)
+    await postEmail({ to: student.email, subject: email.subject, body: email.body })
   }
 
   async function updateStudent(sid, updates) {
