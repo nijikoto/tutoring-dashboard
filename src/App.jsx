@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
-import TopBar from './components/TopBar'
+import { useState, useEffect, useMemo } from 'react'
+import TopBar, { useThemeState } from './components/TopBar'
 import Clock from './components/Clock'
 import StatusBar from './components/StatusBar'
 import CardsGrid from './components/CardsGrid'
+import WeeklySchedule from './components/WeeklySchedule'
 import StudentDetailCard from './components/StudentDetailCard'
 import Toast from './components/Toast'
 import { fetchData, postLog, postEmail, postUpdateStudent, postMarkPaymentReceived } from './api/sheets'
@@ -10,53 +11,37 @@ import { buildEmail, buildFeeReceivedEmail } from './utils/email'
 import { formatDate } from './utils/date'
 
 export default function App() {
+  const themeState = useThemeState()
   const [students, setStudents] = useState([])
   const [logs, setLogs] = useState({})
-  const [status, setStatus] = useState({ msg: '連接中...', type: '' })
-  const [toast, setToast] = useState('')
+  const [status, setStatus] = useState({ msg: 'INITIALISING…', type: 'busy' })
+  const [toast, setToast] = useState({ msg: '', kind: '' })
   const [syncing, setSyncing] = useState(false)
   const [recording, setRecording] = useState(new Set())
   const [openCards, setOpenCards] = useState(new Set())
   const [activeStudent, setActiveStudent] = useState(null)
 
+  useEffect(() => { syncData() }, [])
+
+  function showToast(msg, kind = '') {
+    setToast({ msg, kind })
+    setTimeout(() => setToast({ msg: '', kind: '' }), 3500)
+  }
+
   function openDetail(sid) { setActiveStudent(sid) }
   function closeDetail() { setActiveStudent(null) }
 
-  async function recordFeeReceived(sid) {
-    const student = students.find(s => s.student_id === sid)
-    const studentLogs = logs[sid] || []
-    const lastPayLog = [...studentLogs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
-    if (!lastPayLog) return
-    const now = new Date().toISOString()
-    await postMarkPaymentReceived({ student_id: sid, session_number: lastPayLog.session_number, timestamp: now })
-    setLogs(prev => ({
-      ...prev,
-      [sid]: prev[sid].map(l =>
-        l.session_number === lastPayLog.session_number ? { ...l, paymentReceivedAt: now } : l
-      )
-    }))
-    const email = buildFeeReceivedEmail(student)
-    await postEmail({ to: student.email, subject: email.subject, body: email.body })
-  }
-
-  async function updateStudent(sid, updates) {
-    await postUpdateStudent({ student_id: sid, ...updates })
-    setStudents(prev => prev.map(s => s.student_id === sid ? { ...s, ...updates } : s))
-  }
-
   function toggleCard(sid) {
     setOpenCards(prev => {
-      const next = new Set(prev)
-      next.has(sid) ? next.delete(sid) : next.add(sid)
-      return next
+      const n = new Set(prev)
+      n.has(sid) ? n.delete(sid) : n.add(sid)
+      return n
     })
   }
 
-  useEffect(() => { syncData() }, [])
-
   async function syncData() {
     setSyncing(true)
-    setStatus({ msg: '同步中...', type: '' })
+    setStatus({ msg: 'SYNCING WITH LEDGER…', type: 'busy' })
     try {
       const data = await fetchData()
       const newLogs = {}
@@ -77,9 +62,9 @@ export default function App() {
       })
       setStudents(data.students)
       setLogs(newLogs)
-      setStatus({ msg: '已同步 Google Sheets ✓', type: 'ok' })
+      setStatus({ msg: 'SYNCED ✓  ' + new Date().toLocaleTimeString('en-GB'), type: 'ok' })
     } catch (e) {
-      setStatus({ msg: '同步失敗：' + e.message, type: 'err' })
+      setStatus({ msg: 'SYNC FAILED — ' + e.message, type: 'err' })
     } finally {
       setSyncing(false)
     }
@@ -97,24 +82,23 @@ export default function App() {
     if (student.meet_link) window.open(student.meet_link, '_blank')
 
     setRecording(prev => new Set(prev).add(sid))
-    setStatus({ msg: '記錄中...', type: '' })
+    setStatus({ msg: 'RECORDING SESSION…', type: 'busy' })
     try {
       await postLog({ student_id: sid, session_number: sessionNum, cycle_position: cyclePos, timestamp: now, is_pay_session: isPaySession })
-      const newLog = { time: now, cyclePos, session_number: sessionNum, isPay: isPaySession }
-      const updatedLogs = [...studentLogs, newLog]
-      setLogs(prev => ({ ...prev, [sid]: updatedLogs }))
+      const newLog = { time: now, cyclePos, session_number: sessionNum, isPay: isPaySession, paymentReceivedAt: '' }
+      setLogs(prev => ({ ...prev, [sid]: [...studentLogs, newLog] }))
 
       if (isPaySession) {
         setTimeout(() => {
-          sendPaymentEmail(student, updatedLogs, sessionNum).catch(() => {})
+          sendPaymentEmail(student, [...studentLogs, newLog], sessionNum).catch(() => {})
         }, 65 * 60 * 1000)
-        showToast('💰 ' + student.name + ' 第 ' + Math.ceil(sessionNum / 4) + ' 週期完成，帳單已排程寄出')
+        showToast(student.name + ' · 第 ' + Math.ceil(sessionNum / 4) + ' 週期完成，帳單已排程寄出', 'amber')
       } else {
-        showToast('✓ ' + student.name + ' 第 ' + sessionNum + ' 堂已記錄')
+        showToast(student.name + ' · 第 ' + sessionNum + ' 堂已記錄')
       }
-      setStatus({ msg: '已儲存至 Google Sheets ✓', type: 'ok' })
+      setStatus({ msg: 'SAVED ✓  ' + new Date().toLocaleTimeString('en-GB'), type: 'ok' })
     } catch (e) {
-      setStatus({ msg: '儲存失敗：' + e.message, type: 'err' })
+      setStatus({ msg: 'SAVE FAILED — ' + e.message, type: 'err' })
     } finally {
       setRecording(prev => { const s = new Set(prev); s.delete(sid); return s })
     }
@@ -131,20 +115,82 @@ export default function App() {
     await postEmail({ to: student.email, subject: email.subject, body: email.body })
   }
 
-  function showToast(msg) {
-    setToast(msg)
-    setTimeout(() => setToast(''), 3500)
+  async function recordFeeReceived(sid) {
+    const student = students.find(s => s.student_id === sid)
+    const studentLogs = logs[sid] || []
+    const lastPayLog = [...studentLogs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
+    if (!lastPayLog) return
+    const now = new Date().toISOString()
+    await postMarkPaymentReceived({ student_id: sid, session_number: lastPayLog.session_number, timestamp: now })
+    setLogs(prev => ({
+      ...prev,
+      [sid]: prev[sid].map(l => l.session_number === lastPayLog.session_number ? { ...l, paymentReceivedAt: now } : l)
+    }))
+    const email = buildFeeReceivedEmail(student)
+    await postEmail({ to: student.email, subject: email.subject, body: email.body })
+    showToast(student.name + ' · 學費已標記為已收到', 'amber')
   }
 
+  async function updateStudent(sid, updates) {
+    await postUpdateStudent({ student_id: sid, ...updates })
+    setStudents(prev => prev.map(s => s.student_id === sid ? { ...s, ...updates } : s))
+  }
+
+  const stats = useMemo(() => {
+    let paid = 0, due = 0
+    Object.entries(logs).forEach(([sid, arr]) => {
+      const lastPay = [...arr].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
+      if (lastPay) {
+        if (lastPay.paymentReceivedAt) paid++
+        else if (arr[arr.length - 1]?.cyclePos === 4) due++
+      }
+    })
+    return { count: students.length, paid, due }
+  }, [students, logs])
+
+  function pad2(n) { return String(n).padStart(2, '0') }
+
   return (
-    <>
-      <TopBar onSync={syncData} syncing={syncing} />
+    <div className="frame">
+      <TopBar
+        onSync={syncData}
+        syncing={syncing}
+        theme={themeState.theme}
+        mode={themeState.mode}
+        onPickTheme={themeState.pickTheme}
+        onToggleMode={themeState.toggleMode}
+      />
       <Clock />
-      <StatusBar msg={status.msg} type={status.type} />
-      <div style={{ padding: '0 20px 12px', maxWidth: '1100px', margin: '0 auto' }}>
-        <div className="section-title">學生管理</div>
+      <StatusBar msg={status.msg} type={status.type} count={stats.count} paidCount={stats.paid} dueCount={stats.due} />
+
+      <div className="sec-label">
+        <span>S — 學生管理 / Students</span>
+        <div className="sec-label-r">
+          <span>{pad2(students.length)} 位</span>
+          <span>已收 {pad2(stats.paid)}</span>
+          <span>待收 {pad2(stats.due)}</span>
+          <span>點擊頁籤 → 詳情</span>
+        </div>
       </div>
-      <CardsGrid students={students} logs={logs} onRecord={recordClass} recording={recording} openCards={openCards} onToggle={toggleCard} onOpenDetail={openDetail} onFeeReceived={recordFeeReceived} />
+
+      <CardsGrid
+        students={students}
+        logs={logs}
+        onRecord={recordClass}
+        recording={recording}
+        openCards={openCards}
+        onToggle={toggleCard}
+        onOpenDetail={openDetail}
+        onFeeReceived={recordFeeReceived}
+      />
+
+      <WeeklySchedule students={students} logs={logs} onOpenDetail={openDetail} />
+
+      <div style={{ marginTop: 56, paddingTop: 16, borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--grey-3)' }}>
+        <span>TUTORING DASHBOARD · V2.0</span>
+        <span>{new Date().getFullYear()} · 一人一頁 · 一週一堂 · 四堂一週期</span>
+      </div>
+
       {activeStudent && (
         <StudentDetailCard
           student={students.find(s => s.student_id === activeStudent)}
@@ -153,7 +199,8 @@ export default function App() {
           onSave={(updates) => updateStudent(activeStudent, updates)}
         />
       )}
-      <Toast msg={toast} />
-    </>
+
+      <Toast msg={toast.msg} kind={toast.kind} />
+    </div>
   )
 }

@@ -1,9 +1,16 @@
+import { useState } from 'react'
 import StudentCard from './StudentCard'
 
 export default function CardsGrid({ students, logs, onRecord, recording, openCards, onToggle, onOpenDetail, onFeeReceived }) {
+  const [hover, setHover] = useState(false)
+
   return (
-    <div className="cards-grid">
-      {students.map(s => (
+    <div
+      className={'cards-grid' + (hover ? ' has-hover' : '')}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      {students.map((s, i) => (
         <StudentCard
           key={s.student_id}
           student={s}
@@ -14,6 +21,7 @@ export default function CardsGrid({ students, logs, onRecord, recording, openCar
           onToggle={() => onToggle(s.student_id)}
           onOpenDetail={() => onOpenDetail(s.student_id)}
           onFeeReceived={() => onFeeReceived(s.student_id)}
+          index={i}
         />
       ))}
     </div>

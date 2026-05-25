@@ -1,7 +1,8 @@
 import { formatDT, formatShort } from '../utils/date'
 
-export default function StudentCard({ student, logs, onRecord, disabled, open, onToggle, onOpenDetail, onFeeReceived }) {
+function pad2(n) { return String(n).padStart(2, '0') }
 
+export default function StudentCard({ student, logs, onRecord, disabled, open, onToggle, onOpenDetail, onFeeReceived, index }) {
   const total = logs.length
   const lastCyclePos = total > 0 ? logs[total - 1].cyclePos : 0
   const isPayTime = total > 0 && lastCyclePos === 4
@@ -11,83 +12,86 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
   const showFeeSection = feeReceived ? isPayTime : !!lastPayLog
 
   const dotsFilled = isPayTime ? 4 : lastCyclePos
-  const btnClass = 'start-btn' + (isPayTime ? ' pay-mode' : '')
-  const btnText = '▶ 開始上課'
-
   const recentLogs = [...logs].slice(-4).reverse()
 
   return (
-    <div className={'student-card' + (open ? ' card-open' : '')}>
-      <div className="card-header" onClick={onToggle}>
-        <div className="card-top">
-          <div
-            className="avatar"
-            style={{ background: student.avatar_color, cursor: 'pointer' }}
-            onClick={e => { e.stopPropagation(); onOpenDetail() }}
-          >
-            {student.initials}
+    <div className={'scard' + (open ? ' card-open' : '') + (isPayTime ? ' pay-time' : '')}>
+      <button className="scard-tab" onClick={onOpenDetail} title="Open detail">
+        <span className="scard-tab-idx">{pad2((index ?? 0) + 1)}</span>
+        <span className="scard-tab-name">{student.name}</span>
+      </button>
+
+      <div className="scard-body">
+        <div className="scard-head" onClick={onToggle}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--text-mute)', marginBottom: 4 }}>
+              {student.course}
+            </div>
+            <div className="scard-course">{student.textbook || '—'}</div>
+            <div style={{ marginTop: 6, fontSize: 9, color: 'var(--text-mute)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              {student.schedule || '—'} · 第 {student.textbook_page || '—'} 頁
+            </div>
           </div>
-          <div className="student-info">
-            <div className="student-name">{student.name}</div>
-            <div className="course-name">{student.course}</div>
-          </div>
-          <i className="ti ti-chevron-down chevron"></i>
+          <span className="scard-chevron">▾</span>
         </div>
 
-        <div className="progress-row">
+        <div className="scard-progress">
           <div className="dots">
             {[1, 2, 3, 4].map(i => (
-              <div
-                key={i}
-                className={'dot' + (isPayTime ? ' pay-alert' : i <= dotsFilled ? ' filled' : '')}
-              />
+              <span key={i} className={'dot' + (isPayTime ? ' pay' : i <= dotsFilled ? ' filled' : '')} />
             ))}
           </div>
-          <div className="count-label">共 {total} 堂</div>
+          <div className="scard-count">
+            堂 <strong>{pad2(total)}</strong> · 週期 {pad2(Math.ceil(Math.max(total, 1) / 4))}
+          </div>
         </div>
 
-        <button
-          className={btnClass}
-          disabled={disabled}
-          onClick={e => { e.stopPropagation(); onRecord(student.student_id) }}
-        >
-          {btnText}
-        </button>
+        <div className="scard-actions">
+          <button
+            className={'mbtn' + (isPayTime ? ' amber' : '')}
+            disabled={disabled}
+            onClick={e => { e.stopPropagation(); onRecord(student.student_id) }}
+          >
+            {disabled ? '記錄中…' : '▶ 開始上課'}
+          </button>
 
-        {showFeeSection && (
-          feeReceived ? (
-            <div className="fee-received-status" onClick={e => e.stopPropagation()}>
-              <i className="ti ti-circle-check"></i>
-              <span>學費已收到</span>
-              <span className="fee-timestamp">{formatShort(lastPayLog.paymentReceivedAt)}</span>
+          {showFeeSection && (
+            feeReceived ? (
+              <div className="fee-received" onClick={e => e.stopPropagation()}>
+                <span className="check">✓</span>
+                <span>學費已收到</span>
+                <span className="ts">{formatShort(lastPayLog.paymentReceivedAt)}</span>
+              </div>
+            ) : (
+              <button
+                className="mbtn amber"
+                onClick={e => { e.stopPropagation(); onFeeReceived() }}
+              >
+                ＄ 收到學費
+              </button>
+            )
+          )}
+        </div>
+
+        <div className="acc-body">
+          <div className="acc-inner">
+            <div className="acc-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>上課紀錄 · 最近 4 堂</span>
+              <span style={{ color: 'var(--text-quiet)' }}>{pad2(recentLogs.length)} / {pad2(total)}</span>
             </div>
-          ) : (
-            <button className="fee-btn" onClick={e => { e.stopPropagation(); onFeeReceived() }}>
-              <i className="ti ti-cash"></i> 收到學費
-            </button>
-          )
-        )}
-      </div>
-
-      <div className="accordion-body" style={{ maxHeight: open ? '500px' : '0' }}>
-        <div className="accordion-inner">
-          <div className="history-title">上課紀錄（最近4堂）</div>
-          {logs.length === 0 ? (
-            <div className="no-log">尚無上課紀錄</div>
-          ) : (
-            recentLogs.map(l => {
+            {logs.length === 0 ? (
+              <div className="no-log">尚無上課紀錄</div>
+            ) : recentLogs.map(l => {
               const isPay = l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE'
               return (
-                <div key={l.session_number} className="log-item">
-                  <span className="log-num">{l.session_number}</span>
+                <div key={l.session_number} className="log-row">
+                  <span className="log-idx">{pad2(l.session_number)}</span>
                   <span className="log-date">{formatDT(l.time)}</span>
-                  <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
-                    {'第 ' + l.cyclePos + ' 堂'}
-                  </span>
+                  <span className={'log-badge ' + (isPay ? 'pay' : 'normal')}>第 {l.cyclePos} 堂</span>
                 </div>
               )
-            })
-          )}
+            })}
+          </div>
         </div>
       </div>
     </div>
