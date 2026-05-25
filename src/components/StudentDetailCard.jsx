@@ -12,7 +12,21 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
   const [newLinkUrl, setNewLinkUrl] = useState('')
   const [savingPage, setSavingPage] = useState(false)
   const [savingLinks, setSavingLinks] = useState(false)
+  const [savingMakeup, setSavingMakeup] = useState(false)
+  const [makeupBump, setMakeupBump] = useState(0)
   const [saveError, setSaveError] = useState('')
+
+  const makeupCount = Number(student.makeup_count) || 0
+
+  async function handleMakeupDelta(delta) {
+    const next = Math.max(0, makeupCount + delta)
+    if (next === makeupCount) return
+    setSavingMakeup(true)
+    setMakeupBump(b => b + 1)
+    try { await onSave({ makeup_count: next }) }
+    catch { showSaveError('待補課儲存失敗，請重試') }
+    finally { setSavingMakeup(false) }
+  }
   const [closing, setClosing] = useState(false)
 
   function showSaveError(msg) {
@@ -138,6 +152,28 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
                     {savingPage ? '儲存中' : '儲存'}
                   </button>
                 </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '20px' }}>
+              <div className="detail-section-title">
+                <i className="ti ti-refresh"></i> 待補課
+                {makeupCount > 0 && (
+                  <span style={{ marginLeft: 'auto', color: '#ffd14d', fontFamily: 'Khand, sans-serif', fontSize: 20, fontWeight: 700 }}>
+                    {makeupCount} 堂
+                  </span>
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <button className="detail-save-btn" onClick={() => handleMakeupDelta(+1)} disabled={savingMakeup}>
+                  + 請假
+                </button>
+                <button className="detail-save-btn" onClick={() => handleMakeupDelta(-1)} disabled={savingMakeup || makeupCount <= 0}>
+                  − 已補課
+                </button>
+                {makeupCount === 0 && (
+                  <span className="detail-muted">無待補課</span>
+                )}
               </div>
             </div>
 
