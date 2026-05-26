@@ -491,6 +491,114 @@ body {
   font-style: italic;
 }
 
+/* ── Weekly Schedule ── */
+.sched {
+  padding: 0 20px;
+  max-width: 1100px;
+  margin: 32px auto 0;
+}
+
+.sec-label {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+  font-family: 'Khand', sans-serif; font-size: 12px;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 500;
+}
+.sec-label-r { display: flex; gap: 16px; }
+
+.sched-grid {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sched-col {
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  min-height: 160px; display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+
+.sched-col.today {
+  background: var(--card-hover);
+  border-color: rgba(255,255,255,0.25);
+}
+
+.sched-col-head {
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.sched-col-day {
+  font-family: 'Khand', sans-serif; font-size: 15px; font-weight: 700;
+  color: var(--muted); letter-spacing: 0.5px;
+}
+.sched-col-en { font-family: 'Khand', sans-serif; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+.sched-col.today .sched-col-day { color: var(--txt); }
+.sched-col.today .sched-col-en { color: var(--muted); }
+
+.sched-col-now {
+  background: #ffd14d; color: #7a5000;
+  font-family: 'Khand', sans-serif; font-size: 9px; font-weight: 700;
+  padding: 2px 7px; border-radius: 20px; letter-spacing: 0.5px;
+}
+
+.sched-col-body {
+  padding: 8px; flex: 1;
+  display: flex; flex-direction: column; gap: 6px;
+}
+
+.sched-row {
+  cursor: pointer; padding: 8px 10px; border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.sched-row:hover { background: rgba(255,255,255,0.15); }
+.sched-row.pay { background: rgba(255,209,77,0.12); border-color: rgba(255,209,77,0.3); }
+.sched-row.live { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+
+.sched-row-top { display: flex; align-items: baseline; gap: 6px; margin-bottom: 3px; }
+.sched-time {
+  font-family: 'Khand', sans-serif; font-size: 20px; font-weight: 600;
+  color: var(--txt); line-height: 1;
+}
+.sched-time-sep { opacity: 0.4; }
+.sched-pay-tag {
+  background: #ffd14d; color: #7a5000;
+  font-size: 9px; padding: 1px 6px; border-radius: 10px;
+  font-family: 'Khand', sans-serif; font-weight: 700; margin-left: auto;
+}
+
+.sched-name {
+  font-size: 13px; font-weight: 700; color: var(--txt);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sched-course { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.sched-tb {
+  font-size: 10px; color: var(--muted); margin-top: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sched-meta {
+  display: flex; gap: 4px; margin-top: 4px;
+  font-family: 'Khand', sans-serif; font-size: 10px; color: var(--muted);
+}
+.sched-meta-sep { color: var(--muted); }
+
+.sched-empty {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--muted); padding: 16px 0;
+}
+
+.sched-col-foot {
+  padding: 6px 12px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  font-family: 'Khand', sans-serif; font-size: 10px;
+  letter-spacing: 1px; color: var(--muted);
+}
+
 /* ── Student Detail Card ── */
 .detail-overlay {
   position: fixed;

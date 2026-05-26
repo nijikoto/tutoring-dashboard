@@ -3,6 +3,7 @@ import TopBar from './components/TopBar'
 import Clock from './components/Clock'
 import StatusBar from './components/StatusBar'
 import CardsGrid from './components/CardsGrid'
+import WeeklySchedule from './components/WeeklySchedule'
 import StudentDetailCard from './components/StudentDetailCard'
 import Toast from './components/Toast'
 import { fetchData, postLog, postEmail, postUpdateStudent, postMarkPaymentReceived } from './api/sheets'
@@ -145,6 +146,7 @@ export default function App() {
         <div className="section-title">學生管理</div>
       </div>
       <CardsGrid students={students} logs={logs} onRecord={recordClass} recording={recording} openCards={openCards} onToggle={toggleCard} onOpenDetail={openDetail} onFeeReceived={recordFeeReceived} />
+      <WeeklySchedule students={students} logs={logs} onOpenDetail={openDetail} />
       {activeStudent && (
         <StudentDetailCard
           student={students.find(s => s.student_id === activeStudent)}
