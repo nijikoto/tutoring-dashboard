@@ -122,6 +122,7 @@ export default function TopBar({ onSync, syncing, theme, mode, onPickTheme, onTo
           <span style={{ display: 'inline-block', transform: syncing ? 'rotate(180deg)' : 'none', transition: 'transform 0.4s' }}>↻</span>
           {syncing ? 'Syncing…' : 'Sync'}
         </button>
+        <a href="http://localhost:5180" className="mbtn compact" style={{ textDecoration: 'none' }}>⇄ Classic</a>
         <ModeToggle mode={mode} onToggle={onToggleMode} />
         <ThemePicker theme={theme} mode={mode} onPick={onPickTheme} />
       </div>
