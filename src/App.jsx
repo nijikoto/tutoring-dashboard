@@ -86,6 +86,33 @@ export default function App() {
     }
   }
 
+  async function retroLog(sid, dateStr, time) {
+    const student = students.find(x => x.student_id === sid)
+    const studentLogs = logs[sid] || []
+    const lastLog = studentLogs.length > 0 ? studentLogs[studentLogs.length - 1] : null
+    const cyclePos = lastLog ? (lastLog.cyclePos % 4) + 1 : 1
+    const sessionNum = lastLog ? Math.max(...studentLogs.map(l => l.session_number)) + 1 : 1
+    const isPaySession = cyclePos === 4
+
+    const [h, min] = time ? time.split(':').map(Number) : [12, 0]
+    const [yr, mo, dy] = dateStr.split('-').map(Number)
+    const timestamp = new Date(yr, mo - 1, dy, h, min).toISOString()
+
+    setStatus({ msg: '補打卡記錄中...', type: '' })
+    try {
+      await postLog({ student_id: sid, session_number: sessionNum, cycle_position: cyclePos, timestamp, is_pay_session: isPaySession })
+      const newLog = { time: timestamp, cyclePos, session_number: sessionNum, isPay: isPaySession }
+      setLogs(prev => ({
+        ...prev,
+        [sid]: [...(prev[sid] || []), newLog].sort((a, b) => a.session_number - b.session_number)
+      }))
+      showToast('✓ ' + student.name + ' ' + dateStr + ' 補打卡完成')
+      setStatus({ msg: '已儲存至 Google Sheets ✓', type: 'ok' })
+    } catch (e) {
+      setStatus({ msg: '補打卡失敗：' + e.message, type: 'err' })
+    }
+  }
+
   async function recordClass(sid) {
     const student = students.find(x => x.student_id === sid)
     const studentLogs = logs[sid] || []
@@ -153,6 +180,7 @@ export default function App() {
           logs={logs[activeStudent] || []}
           onClose={closeDetail}
           onSave={(updates) => updateStudent(activeStudent, updates)}
+          onRetroLog={(dateStr, time) => retroLog(activeStudent, dateStr, time)}
         />
       )}
       <Toast msg={toast} />

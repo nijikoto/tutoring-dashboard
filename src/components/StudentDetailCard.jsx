@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { formatDateOnly, formatDT } from '../utils/date'
 import SessionCalendar from './SessionCalendar'
 
-export default function StudentDetailCard({ student, logs, onClose, onSave }) {
+export default function StudentDetailCard({ student, logs, onClose, onSave, onRetroLog }) {
   const [editPage, setEditPage] = useState(student.textbook_page ?? '')
   const [links, setLinks] = useState([
     student.gamma_link_1 || '',
@@ -251,7 +251,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave }) {
               <i className="ti ti-calendar"></i> 上課紀錄
             </div>
             <div className="detail-record-row">
-              <SessionCalendar logs={logs} schedule={student.schedule} />
+              <SessionCalendar logs={logs} schedule={student.schedule} onRetroLog={onRetroLog} />
               <div className="detail-log-list">
                 {recentLogs.length === 0 ? (
                   <div className="no-log">尚無上課紀錄</div>

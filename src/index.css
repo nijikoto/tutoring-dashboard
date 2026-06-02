@@ -1033,6 +1033,96 @@ body {
 
 .cal-dot.makeup { background: rgba(255,182,210,0.9); }
 
+.cal-cell.retro-target { cursor: pointer; }
+.cal-cell.retro-target:hover { background: rgba(255,255,255,0.06); }
+.cal-cell.retro-target:hover .cal-day { color: rgba(255,255,255,0.55); }
+
+.cal-cell.retro-pending { background: rgba(255,209,77,0.12); border: 1px solid rgba(255,209,77,0.3); }
+.cal-cell.retro-pending .cal-day { color: #ffd14d; }
+
+.cal-retro-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 7px 10px;
+  background: rgba(255,209,77,0.07);
+  border: 1px solid rgba(255,209,77,0.2);
+  border-radius: 8px;
+}
+.cal-retro-date {
+  font-family: 'Khand', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffd14d;
+}
+.cal-retro-time {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.cal-retro-time-sep { color: rgba(255,255,255,0.35); font-size: 13px; font-family: 'Khand', sans-serif; }
+
+.ts-wrap { position: relative; }
+.ts-trigger {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  color: #fff;
+  font-family: 'Khand', sans-serif;
+  font-size: 13px;
+  padding: 3px 6px;
+  cursor: pointer;
+  min-width: 44px;
+  justify-content: space-between;
+}
+.ts-trigger:hover { background: rgba(255,255,255,0.13); }
+.ts-arrow { font-size: 10px; color: rgba(255,255,255,0.4); }
+.ts-list {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  background: #1e1e2e;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  padding: 4px 0;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 100;
+  min-width: 56px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+.ts-item {
+  padding: 5px 12px;
+  font-family: 'Khand', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  list-style: none;
+}
+.ts-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.ts-item.selected { color: #ffd14d; font-weight: 700; }
+.cal-retro-btn {
+  border: none;
+  border-radius: 4px;
+  font-family: 'Khand', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+.cal-retro-btn.confirm { background: #ffd14d; color: #7a5000; }
+.cal-retro-btn.confirm:hover { opacity: 0.85; }
+.cal-retro-btn.cancel { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.45); }
+.cal-retro-btn.cancel:hover { background: rgba(255,255,255,0.15); }
+
 .cal-legend {
   display: flex;
   gap: 14px;
