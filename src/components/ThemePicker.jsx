@@ -1,22 +1,70 @@
 import { useState, useEffect, useRef } from 'react'
 
+function hexToHsl(hex) {
+  let r = parseInt(hex.slice(1, 3), 16) / 255
+  let g = parseInt(hex.slice(3, 5), 16) / 255
+  let b = parseInt(hex.slice(5, 7), 16) / 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  let h, s, l = (max + min) / 2
+  if (max === min) {
+    h = s = 0
+  } else {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break
+      case g: h = ((b - r) / d + 2) / 6; break
+      case b: h = ((r - g) / d + 4) / 6; break
+    }
+  }
+  return [h * 360, s * 100, l * 100]
+}
+
+function hslToHex(h, s, l) {
+  h /= 360; s /= 100; l /= 100
+  let r, g, b
+  if (s === 0) {
+    r = g = b = l
+  } else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1; if (t > 1) t -= 1
+      if (t < 1 / 6) return p + (q - p) * 6 * t
+      if (t < 1 / 2) return q
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6
+      return p
+    }
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+    const p = 2 * l - q
+    r = hue2rgb(p, q, h + 1 / 3)
+    g = hue2rgb(p, q, h)
+    b = hue2rgb(p, q, h - 1 / 3)
+  }
+  return '#' + [r, g, b].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('')
+}
+
+function getContrastAccent(bgHex) {
+  const [h, , l] = hexToHsl(bgHex)
+  const accentH = (h + 210) % 360
+  const accentL = l < 45 ? 72 : 28
+  return hslToHex(accentH, 90, accentL)
+}
+
 const PRESETS = [
-  { name: '番茄紅', bg: '#ba4a43', accent: '#c7534b' },
-  { name: '靛紫',   bg: '#4a4580', accent: '#7F77DD' },
-  { name: '海藍',   bg: '#1a4a7a', accent: '#378ADD' },
-  { name: '青綠',   bg: '#0d5e45', accent: '#1D9E75' },
-  { name: '珊瑚橘', bg: '#8a3820', accent: '#D85A30' },
-  { name: '玫瑰粉', bg: '#7a2e4a', accent: '#D4537E' },
-  { name: '墨夜',   bg: '#2a2a2a', accent: '#888780' },
-]
+  { name: '海軍藍', bg: '#1e2d4a' },
+  { name: '深墨綠', bg: '#0d3325' },
+  { name: '深紫',   bg: '#2a1a4a' },
+  { name: '深磚紅', bg: '#3d1515' },
+  { name: '深橄欖', bg: '#2a2d10' },
+  { name: '深靛',   bg: '#0f1a3d' },
+  { name: '墨夜',   bg: '#141414' },
+].map(p => ({ ...p, accent: getContrastAccent(p.bg) }))
 
 const DEFAULT_THEME = PRESETS[0]
 const STORAGE_KEY = 'tutoring-dashboard-theme'
 
 function applyTheme(theme) {
   document.documentElement.style.setProperty('--bg', theme.bg)
-  document.documentElement.style.setProperty('--red', theme.accent)
-  document.documentElement.style.setProperty('--btn-txt', theme.accent)
+  document.documentElement.style.setProperty('--accent', theme.accent)
 }
 
 export default function ThemePicker() {
@@ -55,7 +103,8 @@ export default function ThemePicker() {
 
   function handleCustom(e) {
     const bg = e.target.value
-    selectTheme({ name: '自訂', bg, accent: bg })
+    const accent = getContrastAccent(bg)
+    selectTheme({ name: '自訂', bg, accent })
   }
 
   return (
@@ -73,10 +122,12 @@ export default function ThemePicker() {
               <button
                 key={p.name}
                 className={'swatch' + (theme.bg === p.bg ? ' active' : '')}
-                style={{ background: p.bg }}
+                style={{ background: p.bg, borderColor: p.accent }}
                 onClick={() => selectTheme(p)}
                 title={p.name}
-              />
+              >
+                <span className="swatch-accent" style={{ background: p.accent }} />
+              </button>
             ))}
           </div>
           <div className="theme-custom-row">
