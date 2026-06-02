@@ -91,6 +91,22 @@ function doPost(e) {
       return res({ success: false, error: 'Student not found' });
     }
 
+    if (body.action === 'deleteLog') {
+      const sheet = ss.getSheetByName(SHEET_SESSIONS);
+      const rows = sheet.getDataRange().getValues();
+      const headers = rows[0];
+      const idCol = headers.indexOf('student_id');
+      const sessionNumCol = headers.indexOf('session_number');
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][idCol]) === String(body.student_id) &&
+            Number(rows[i][sessionNumCol]) === Number(body.session_number)) {
+          sheet.deleteRow(i + 1);
+          return res({ success: true });
+        }
+      }
+      return res({ success: false, error: 'Session not found' });
+    }
+
     return res({ success: false, error: 'Unknown action' });
   } catch(err) {
     return res({ success: false, error: err.message });

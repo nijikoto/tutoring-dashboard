@@ -6,7 +6,7 @@ import CardsGrid from './components/CardsGrid'
 import WeeklySchedule from './components/WeeklySchedule'
 import StudentDetailCard from './components/StudentDetailCard'
 import Toast from './components/Toast'
-import { fetchData, postLog, postEmail, postUpdateStudent, postMarkPaymentReceived } from './api/sheets'
+import { fetchData, postLog, postEmail, postUpdateStudent, postMarkPaymentReceived, postDeleteLog } from './api/sheets'
 import { buildEmail, buildFeeReceivedEmail } from './utils/email'
 import { formatDate } from './utils/date'
 
@@ -83,6 +83,21 @@ export default function App() {
       setStatus({ msg: '同步失敗：' + e.message, type: 'err' })
     } finally {
       setSyncing(false)
+    }
+  }
+
+  async function deleteLog(sid, sessionNumber) {
+    setStatus({ msg: '刪除中...', type: '' })
+    try {
+      await postDeleteLog({ student_id: sid, session_number: sessionNumber })
+      setLogs(prev => ({
+        ...prev,
+        [sid]: prev[sid].filter(l => l.session_number !== sessionNumber)
+      }))
+      showToast('已刪除第 ' + sessionNumber + ' 堂紀錄')
+      setStatus({ msg: '已儲存至 Google Sheets ✓', type: 'ok' })
+    } catch (e) {
+      setStatus({ msg: '刪除失敗：' + e.message, type: 'err' })
     }
   }
 
@@ -181,6 +196,7 @@ export default function App() {
           onClose={closeDetail}
           onSave={(updates) => updateStudent(activeStudent, updates)}
           onRetroLog={(dateStr, time) => retroLog(activeStudent, dateStr, time)}
+          onDeleteLog={(sessionNumber) => deleteLog(activeStudent, sessionNumber)}
         />
       )}
       <Toast msg={toast} />

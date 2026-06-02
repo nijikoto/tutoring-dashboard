@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { formatDateOnly, formatDT } from '../utils/date'
 import SessionCalendar from './SessionCalendar'
 
-export default function StudentDetailCard({ student, logs, onClose, onSave, onRetroLog }) {
+export default function StudentDetailCard({ student, logs, onClose, onSave, onRetroLog, onDeleteLog }) {
   const [editPage, setEditPage] = useState(student.textbook_page ?? '')
   const [links, setLinks] = useState([
     student.gamma_link_1 || '',
@@ -15,6 +15,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
   const [savingMakeup, setSavingMakeup] = useState(false)
   const [makeupBump, setMakeupBump] = useState(0)
   const [saveError, setSaveError] = useState('')
+  const [pendingDelete, setPendingDelete] = useState(null)
 
   const makeupCount = Number(student.makeup_count) || 0
 
@@ -257,13 +258,33 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
                   <div className="no-log">尚無上課紀錄</div>
                 ) : recentLogs.map(l => {
                   const isPay = l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE'
+                  const isConfirming = pendingDelete === l.session_number
                   return (
-                    <div key={l.session_number} className="detail-log-item">
+                    <div key={l.session_number} className={'detail-log-item' + (isConfirming ? ' confirming' : '')}>
                       <span className="log-num">{l.session_number}</span>
                       <span className="log-date">{formatDT(l.time)}</span>
-                      <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
-                        {'第 ' + l.cyclePos + ' 堂'}
-                      </span>
+                      {isConfirming ? (
+                        <div className="log-delete-confirm">
+                          <span className="log-delete-label">刪除？</span>
+                          <button className="log-delete-yes" onClick={() => { onDeleteLog(l.session_number); setPendingDelete(null) }}>
+                            <i className="ti ti-check"></i>
+                          </button>
+                          <button className="log-delete-no" onClick={() => setPendingDelete(null)}>
+                            <i className="ti ti-x"></i>
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
+                            {'第 ' + l.cyclePos + ' 堂'}
+                          </span>
+                          {onDeleteLog && (
+                            <button className="log-trash-btn" onClick={() => setPendingDelete(l.session_number)}>
+                              <i className="ti ti-trash"></i>
+                            </button>
+                          )}
+                        </>
+                      )}
                     </div>
                   )
                 })}

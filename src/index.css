@@ -956,6 +956,43 @@ body {
 
 .detail-log-item:last-child { border-bottom: none; }
 
+.detail-log-item .log-trash-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: rgba(255,100,100,0.5);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 14px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.detail-log-item:hover .log-trash-btn { display: flex; }
+.detail-log-item .log-trash-btn:hover { color: rgba(255,80,80,0.9); }
+
+.log-delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.log-delete-label {
+  font-family: 'Khand', sans-serif;
+  font-size: 12px;
+  color: rgba(255,150,150,0.8);
+}
+.log-delete-yes, .log-delete-no {
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.log-delete-yes { background: rgba(255,80,80,0.2); color: rgba(255,120,120,0.9); }
+.log-delete-yes:hover { background: rgba(255,80,80,0.35); }
+.log-delete-no { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+.log-delete-no:hover { background: rgba(255,255,255,0.14); }
+
 /* ── Session Calendar ── */
 .cal-wrap { width: 100%; max-width: 260px; }
 

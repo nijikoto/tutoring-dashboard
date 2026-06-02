@@ -35,6 +35,15 @@ export async function postUpdateStudent(payload) {
   if (!data.success) throw new Error(data.error)
 }
 
+export async function postDeleteLog(payload) {
+  const res = await fetch(API, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'deleteLog', ...payload }),
+  })
+  const data = await res.json()
+  if (!data.success) throw new Error(data.error)
+}
+
 export async function postEmail(payload) {
   const res = await fetch(API, {
     method: 'POST',
