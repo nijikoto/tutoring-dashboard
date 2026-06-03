@@ -40,6 +40,14 @@ export default function App() {
     await postEmail({ to: student.email, subject: email.subject, body: email.body })
   }
 
+  async function sendPaymentEmailManual(sid) {
+    const student = students.find(s => s.student_id === sid)
+    const studentLogs = logs[sid] || []
+    const lastPayLog = [...studentLogs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
+    if (!lastPayLog) throw new Error('找不到第四堂紀錄')
+    await sendPaymentEmail(student, studentLogs, lastPayLog.session_number)
+  }
+
   async function updateStudent(sid, updates) {
     await postUpdateStudent({ student_id: sid, ...updates })
     setStudents(prev => prev.map(s => s.student_id === sid ? { ...s, ...updates } : s))
@@ -197,6 +205,7 @@ export default function App() {
           onSave={(updates) => updateStudent(activeStudent, updates)}
           onRetroLog={(dateStr, time) => retroLog(activeStudent, dateStr, time)}
           onDeleteLog={(sessionNumber) => deleteLog(activeStudent, sessionNumber)}
+          onSendPaymentEmail={() => sendPaymentEmailManual(activeStudent)}
         />
       )}
       <Toast msg={toast} />

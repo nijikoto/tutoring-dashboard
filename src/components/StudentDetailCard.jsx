@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { formatDateOnly, formatDT } from '../utils/date'
 import SessionCalendar from './SessionCalendar'
 
-export default function StudentDetailCard({ student, logs, onClose, onSave, onRetroLog, onDeleteLog }) {
+export default function StudentDetailCard({ student, logs, onClose, onSave, onRetroLog, onDeleteLog, onSendPaymentEmail }) {
   const [editPage, setEditPage] = useState(student.textbook_page ?? '')
   const [links, setLinks] = useState([
     student.gamma_link_1 || '',
@@ -19,6 +19,8 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
   const [meetLink, setMeetLink] = useState(student.meet_link || '')
   const [editingMeet, setEditingMeet] = useState(false)
   const [savingMeet, setSavingMeet] = useState(false)
+  const [sendingEmail, setSendingEmail] = useState(false)
+  const [emailMsg, setEmailMsg] = useState({ text: '', ok: true })
 
   const makeupCount = Number(student.makeup_count) || 0
 
@@ -43,6 +45,21 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
   const recentLogs = [...logs].slice(-8).reverse()
   const filledLinks = links.filter(Boolean)
   const canAddLink = filledLinks.length < 2
+
+  async function handleSendPaymentEmail() {
+    setSendingEmail(true)
+    setEmailMsg({ text: '', ok: true })
+    try {
+      await onSendPaymentEmail()
+      setEmailMsg({ text: '✓ 繳費通知已寄出', ok: true })
+      setTimeout(() => setEmailMsg({ text: '', ok: true }), 3000)
+    } catch (e) {
+      setEmailMsg({ text: e.message || '寄送失敗，請重試', ok: false })
+      setTimeout(() => setEmailMsg({ text: '', ok: true }), 3000)
+    } finally {
+      setSendingEmail(false)
+    }
+  }
 
   async function saveMeetLink() {
     setSavingMeet(true)
@@ -336,6 +353,22 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
                 </div>
               )}
             </div>
+
+            {onSendPaymentEmail && (
+              <div style={{ marginTop: '10px' }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <button className="detail-email-btn" onClick={handleSendPaymentEmail} disabled={sendingEmail}>
+                    <i className="ti ti-mail"></i>
+                    {sendingEmail ? '寄送中...' : '寄送繳費通知'}
+                  </button>
+                </div>
+                {emailMsg.text && (
+                  <div style={{ marginTop: 6, fontSize: 12, color: emailMsg.ok ? 'rgba(100,220,130,0.85)' : 'rgba(255,120,120,0.85)' }}>
+                    {emailMsg.text}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
         </div>
