@@ -85,6 +85,8 @@ function doPost(e) {
           if (body.gamma_link_2 !== undefined) sheet.getRange(i + 1, link2Col + 1).setValue(body.gamma_link_2);
           const makeupCol = headers.indexOf('makeup_count');
           if (body.makeup_count !== undefined && makeupCol !== -1) sheet.getRange(i + 1, makeupCol + 1).setValue(body.makeup_count);
+          const meetCol = headers.indexOf('meet_link');
+          if (body.meet_link !== undefined && meetCol !== -1) sheet.getRange(i + 1, meetCol + 1).setValue(body.meet_link);
           return res({ success: true });
         }
       }

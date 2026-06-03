@@ -16,6 +16,9 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
   const [makeupBump, setMakeupBump] = useState(0)
   const [saveError, setSaveError] = useState('')
   const [pendingDelete, setPendingDelete] = useState(null)
+  const [meetLink, setMeetLink] = useState(student.meet_link || '')
+  const [editingMeet, setEditingMeet] = useState(false)
+  const [savingMeet, setSavingMeet] = useState(false)
 
   const makeupCount = Number(student.makeup_count) || 0
 
@@ -40,6 +43,18 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
   const recentLogs = [...logs].slice(-8).reverse()
   const filledLinks = links.filter(Boolean)
   const canAddLink = filledLinks.length < 2
+
+  async function saveMeetLink() {
+    setSavingMeet(true)
+    try {
+      await onSave({ meet_link: meetLink })
+      setEditingMeet(false)
+    } catch {
+      showSaveError('Meet 連結儲存失敗，請重試')
+    } finally {
+      setSavingMeet(false)
+    }
+  }
 
   function handleClose() {
     setClosing(true)
@@ -291,11 +306,36 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
               </div>
             </div>
 
-            {student.meet_link && (
-              <button className="detail-meet-btn" style={{ marginTop: '16px' }} onClick={() => window.open(student.meet_link, '_blank')}>
-                <i className="ti ti-video"></i> Google Meet
-              </button>
-            )}
+            <div style={{ marginTop: '16px' }}>
+              {meetLink && !editingMeet ? (
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <button className="detail-meet-btn" onClick={() => window.open(meetLink, '_blank')}>
+                    <i className="ti ti-video"></i> Google Meet
+                  </button>
+                  <button className="detail-icon-btn btn-link" onClick={() => setEditingMeet(true)}>
+                    <i className="ti ti-pencil"></i>
+                  </button>
+                </div>
+              ) : (
+                <div className="detail-gamma-item">
+                  <input
+                    className="detail-link-input"
+                    type="url"
+                    placeholder="貼上 Google Meet 連結..."
+                    value={meetLink}
+                    onChange={e => setMeetLink(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && saveMeetLink()}
+                    autoFocus={editingMeet}
+                  />
+                  <button className="detail-icon-btn btn-link" onClick={saveMeetLink} disabled={savingMeet}>
+                    <i className="ti ti-check"></i>
+                  </button>
+                  <button className="detail-icon-btn btn-delete" onClick={() => { setMeetLink(student.meet_link || ''); setEditingMeet(false) }}>
+                    <i className="ti ti-x"></i>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
         </div>
