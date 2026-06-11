@@ -42,6 +42,8 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
 
   const thisYear = new Date().getFullYear()
   const yearCount = logs.filter(l => new Date(l.time).getFullYear() === thisYear).length
+  const sortedLogs = [...logs].sort((a, b) => a.session_number - b.session_number)
+  const cyclePosMap = Object.fromEntries(sortedLogs.map((l, i) => [l.session_number, (i % 4) + 1]))
   const recentLogs = [...logs].slice(-8).reverse()
   const filledLinks = links.filter(Boolean)
   const canAddLink = filledLinks.length < 2
@@ -289,7 +291,8 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
                 {recentLogs.length === 0 ? (
                   <div className="no-log">尚無上課紀錄</div>
                 ) : recentLogs.map(l => {
-                  const isPay = l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE'
+                  const computedCyclePos = cyclePosMap[l.session_number] ?? l.cyclePos
+                  const isPay = computedCyclePos === 4
                   const isConfirming = pendingDelete === l.session_number
                   return (
                     <div key={l.session_number} className={'detail-log-item' + (isConfirming ? ' confirming' : '')}>
@@ -308,7 +311,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
                       ) : (
                         <>
                           <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
-                            {'第 ' + l.cyclePos + ' 堂'}
+                            {'第 ' + computedCyclePos + ' 堂'}
                           </span>
                           {onDeleteLog && (
                             <button className="log-trash-btn" onClick={() => setPendingDelete(l.session_number)}>
