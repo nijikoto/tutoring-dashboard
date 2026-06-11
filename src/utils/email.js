@@ -1,60 +1,35 @@
+import templates from './email-templates.json'
+
+function fill(str, vars) {
+  return str.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? '')
+}
+
 export function buildFeeReceivedEmail(student) {
+  const t = templates.paymentReceived
+  const vars = { name: student.name }
   return {
-    subject: `【授業料受領確認】${student.name}さん`,
-    body:
-`${student.name}さん
-
-お世話になっております。
-授業料のお支払いを確認いたしました。
-
-今月もレッスンにご参加いただき、ありがとうございました。
-また次回お会いしましょう。`,
+    subject: fill(t.subject, vars),
+    body: fill(t.body, vars),
   }
 }
 
 export function buildEmail(student, dates, total) {
   const isJapanese = student.course === '日文課'
+  const t = isJapanese ? templates.paymentRequest.japanese : templates.paymentRequest.english
 
-  if (isJapanese) {
-    const dateLines = dates.map(d => `　・${d}`).join('\n')
-    return {
-      subject: `【授業料のお知らせ】${student.name}さん`,
-      body:
-`${student.name}さん、こんにちは！
+  const dateLines = isJapanese
+    ? dates.map(d => `　・${d}`).join('\n')
+    : dates.map(d => `  - ${d}`).join('\n')
 
-今期の授業が4回完了しましたので、授業料のお知らせをお送りします。
-
-【受講日】
-${dateLines}
-
-【授業料】
-　単価：NT$${Number(student.price).toLocaleString()} × 4回
-　合計：NT$${total.toLocaleString()}
-
-お支払いの方法についてはご確認ください。
-ご不明な点がございましたら、お気軽にご連絡ください。
-
-どうぞよろしくお願いいたします。`,
-    }
+  const vars = {
+    name: student.name,
+    price: Number(student.price).toLocaleString(),
+    total: total.toLocaleString(),
+    dateLines,
   }
 
-  const dateLines = dates.map(d => `  - ${d}`).join('\n')
   return {
-    subject: `[Tuition Payment] ${student.name}`,
-    body:
-`Hi ${student.name},
-
-We have completed 4 lessons this cycle. Here is your tuition summary:
-
-Lesson Dates:
-${dateLines}
-
-Tuition Fee:
-  NT$${Number(student.price).toLocaleString()} × 4 lessons = NT$${total.toLocaleString()}
-
-Please arrange the payment at your earliest convenience.
-Feel free to reach out if you have any questions!
-
-Best regards,`,
+    subject: fill(t.subject, vars),
+    body: fill(t.body, vars),
   }
 }

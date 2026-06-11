@@ -1,0 +1,16 @@
+{
+  "paymentRequest": {
+    "japanese": {
+      "subject": "【授業料のお知らせ】{name}さん",
+      "body": "{name}さん、こんにちは！\n\n今期の授業が4回完了しましたので、授業料のお知らせをお送りします。\n\n【受講日】\n{dateLines}\n\n【授業料】\n　単価：NT${price} × 4回\n　合計：NT${total}\n\nお支払いの方法についてはご確認ください。\nご不明な点がございましたら、お気軽にご連絡ください。\n\nどうぞよろしくお願いいたします。"
+    },
+    "english": {
+      "subject": "[Tuition Payment] {name}",
+      "body": "Hi {name},\n\nWe have completed 4 lessons this cycle. Here is your tuition summary:\n\nLesson Dates:\n{dateLines}\n\nTuition Fee:\n  NT${price} × 4 lessons = NT${total}\n\nPlease arrange the payment at your earliest convenience.\nFeel free to reach out if you have any questions!\n\nBest regards,"
+    }
+  },
+  "paymentReceived": {
+    "subject": "【授業料受領確認】{name}さん",
+    "body": "{name}さん\n\nお世話になっております。\n授業料のお支払いを確認いたしました。\n\n今月もレッスンにご参加いただき、ありがとうございました。\nまた次回お会いしましょう。"
+  }
+}
