@@ -15,7 +15,7 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
 
   const dotsFilled = isPayTime ? 4 : lastCyclePos
   const btnClass = 'start-btn'
-  const btnText = '▶ 開始上課'
+  const btnText = (isPayTime && !feeReceived) ? '▶ 開始上課，寄送收費單' : '▶ 開始上課'
 
   const recentLogs = [...logs].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 4)
 

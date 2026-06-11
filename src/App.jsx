@@ -26,7 +26,8 @@ export default function App() {
   async function recordFeeReceived(sid) {
     const student = students.find(s => s.student_id === sid)
     const studentLogs = logs[sid] || []
-    const lastPayLog = [...studentLogs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
+    const sorted = [...studentLogs].sort((a, b) => new Date(a.time) - new Date(b.time))
+    const lastPayLog = sorted.filter((_, i) => (i % 4) + 1 === 4).slice(-1)[0]
     if (!lastPayLog) return
     const now = new Date().toISOString()
     await postMarkPaymentReceived({ student_id: sid, session_number: lastPayLog.session_number, timestamp: now })
@@ -115,9 +116,8 @@ export default function App() {
   async function retroLog(sid, dateStr, time) {
     const student = students.find(x => x.student_id === sid)
     const studentLogs = logs[sid] || []
-    const lastLog = studentLogs.length > 0 ? studentLogs[studentLogs.length - 1] : null
-    const cyclePos = lastLog ? (lastLog.cyclePos % 4) + 1 : 1
-    const sessionNum = lastLog ? Math.max(...studentLogs.map(l => l.session_number)) + 1 : 1
+    const cyclePos = (studentLogs.length % 4) + 1
+    const sessionNum = studentLogs.length > 0 ? Math.max(...studentLogs.map(l => l.session_number)) + 1 : 1
     const isPaySession = cyclePos === 4
 
     const [h, min] = time ? time.split(':').map(Number) : [12, 0]
@@ -142,9 +142,8 @@ export default function App() {
   async function recordClass(sid) {
     const student = students.find(x => x.student_id === sid)
     const studentLogs = logs[sid] || []
-    const lastLog = studentLogs.length > 0 ? studentLogs[studentLogs.length - 1] : null
-    const cyclePos = lastLog ? (lastLog.cyclePos % 4) + 1 : 1
-    const sessionNum = lastLog ? Math.max(...studentLogs.map(l => l.session_number)) + 1 : 1
+    const cyclePos = (studentLogs.length % 4) + 1
+    const sessionNum = studentLogs.length > 0 ? Math.max(...studentLogs.map(l => l.session_number)) + 1 : 1
     const now = new Date().toISOString()
     const isPaySession = cyclePos === 4
 
