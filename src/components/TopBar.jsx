@@ -12,7 +12,6 @@ export default function TopBar({ onSync, syncing }) {
         <button className="sync-btn" onClick={onSync} disabled={syncing}>
           <i className="ti ti-refresh"></i> 同步
         </button>
-        <a href="http://localhost:5174" className="sync-btn" style={{ textDecoration: 'none' }}>⇄ Folder</a>
         <ThemePicker />
       </div>
     </div>
