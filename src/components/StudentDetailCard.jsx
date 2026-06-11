@@ -44,6 +44,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
   const yearCount = logs.filter(l => new Date(l.time).getFullYear() === thisYear).length
   const sortedLogs = [...logs].sort((a, b) => new Date(a.time) - new Date(b.time))
   const cyclePosMap = Object.fromEntries(sortedLogs.map((l, i) => [l.session_number, (i % 4) + 1]))
+  const lastFourthSession = [...sortedLogs].filter((_, i) => (i % 4) + 1 === 4).slice(-1)[0]?.session_number
   const recentLogs = [...logs].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 8)
   const filledLinks = links.filter(Boolean)
   const canAddLink = filledLinks.length < 2
@@ -293,6 +294,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
                 ) : recentLogs.map(l => {
                   const computedCyclePos = cyclePosMap[l.session_number] ?? l.cyclePos
                   const isPay = computedCyclePos === 4
+                  const isReceived = isPay && (l.session_number !== lastFourthSession || !!l.paymentReceivedAt)
                   const isConfirming = pendingDelete === l.session_number
                   return (
                     <div key={l.session_number} className={'detail-log-item' + (isConfirming ? ' confirming' : '')}>
@@ -310,7 +312,7 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
                         </div>
                       ) : (
                         <>
-                          <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
+                          <span className={'log-badge ' + (isReceived ? 'badge-received' : isPay ? 'badge-pay' : 'badge-normal')}>
                             {'第 ' + computedCyclePos + ' 堂'}
                           </span>
                           {onDeleteLog && (

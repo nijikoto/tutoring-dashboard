@@ -480,8 +480,9 @@ body {
   letter-spacing: 0.5px;
 }
 
-.badge-normal { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
-.badge-pay    { background: #ffd14d; color: #7a5000; }
+.badge-normal    { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+.badge-pay       { background: #ffd14d; color: #7a5000; }
+.badge-received  { background: #4caf82; color: #fff; }
 
 .no-log {
   font-size: 12px;
