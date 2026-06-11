@@ -42,9 +42,9 @@ export default function StudentDetailCard({ student, logs, onClose, onSave, onRe
 
   const thisYear = new Date().getFullYear()
   const yearCount = logs.filter(l => new Date(l.time).getFullYear() === thisYear).length
-  const sortedLogs = [...logs].sort((a, b) => a.session_number - b.session_number)
+  const sortedLogs = [...logs].sort((a, b) => new Date(a.time) - new Date(b.time))
   const cyclePosMap = Object.fromEntries(sortedLogs.map((l, i) => [l.session_number, (i % 4) + 1]))
-  const recentLogs = [...logs].slice(-8).reverse()
+  const recentLogs = [...logs].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 8)
   const filledLinks = links.filter(Boolean)
   const canAddLink = filledLinks.length < 2
 

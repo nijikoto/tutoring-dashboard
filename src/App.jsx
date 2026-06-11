@@ -43,9 +43,10 @@ export default function App() {
   async function sendPaymentEmailManual(sid) {
     const student = students.find(s => s.student_id === sid)
     const studentLogs = logs[sid] || []
-    const lastPayLog = [...studentLogs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
-    if (!lastPayLog) throw new Error('找不到第四堂紀錄')
-    await sendPaymentEmail(student, studentLogs, lastPayLog.session_number)
+    const sorted = [...studentLogs].sort((a, b) => new Date(a.time) - new Date(b.time))
+    const lastFourthIdx = sorted.reduce((found, _, i) => ((i % 4) + 1 === 4 ? i : found), -1)
+    if (lastFourthIdx < 0) throw new Error('找不到第四堂紀錄')
+    await sendPaymentEmail(student, sorted, lastFourthIdx)
   }
 
   async function updateStudent(sid, updates) {
@@ -157,7 +158,9 @@ export default function App() {
 
       if (isPaySession) {
         setTimeout(() => {
-          sendPaymentEmail(student, updatedLogs, sessionNum).catch(() => {})
+          const sorted = [...updatedLogs].sort((a, b) => new Date(a.time) - new Date(b.time))
+          const fourthIdx = sorted.findIndex(l => l.session_number === sessionNum)
+          sendPaymentEmail(student, sorted, fourthIdx).catch(() => {})
         }, 65 * 60 * 1000)
         showToast('💰 ' + student.name + ' 第 ' + Math.ceil(sessionNum / 4) + ' 週期完成，帳單已排程寄出')
       } else {
@@ -171,11 +174,8 @@ export default function App() {
     }
   }
 
-  async function sendPaymentEmail(student, studentLogs, lastSessionNum) {
-    const startSession = lastSessionNum - 3
-    const cycleLogs = studentLogs
-      .filter(l => l.session_number >= startSession && l.session_number <= lastSessionNum)
-      .sort((a, b) => a.session_number - b.session_number)
+  async function sendPaymentEmail(student, sortedLogs, fourthIdx) {
+    const cycleLogs = sortedLogs.slice(Math.max(0, fourthIdx - 3), fourthIdx + 1)
     const dates = cycleLogs.map(l => formatDate(l.time))
     const total = Number(student.price) * 4
     const email = buildEmail(student, dates, total)

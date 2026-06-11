@@ -3,10 +3,13 @@ import { formatDT, formatShort } from '../utils/date'
 export default function StudentCard({ student, logs, onRecord, disabled, open, onToggle, onOpenDetail, onFeeReceived }) {
 
   const total = logs.length
-  const lastCyclePos = total > 0 ? logs[total - 1].cyclePos : 0
+  const sortedByDate = [...logs].sort((a, b) => new Date(a.time) - new Date(b.time))
+  const cyclePosMap = Object.fromEntries(sortedByDate.map((l, i) => [l.session_number, (i % 4) + 1]))
+  const lastLog = sortedByDate[sortedByDate.length - 1]
+  const lastCyclePos = lastLog ? cyclePosMap[lastLog.session_number] : 0
   const isPayTime = total > 0 && lastCyclePos === 4
 
-  const lastPayLog = [...logs].reverse().find(l => l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE')
+  const lastPayLog = [...sortedByDate].reverse().find(l => cyclePosMap[l.session_number] === 4)
   const feeReceived = !!(lastPayLog?.paymentReceivedAt)
   const showFeeSection = feeReceived ? isPayTime : !!lastPayLog
 
@@ -14,7 +17,7 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
   const btnClass = 'start-btn' + (isPayTime ? ' pay-mode' : '')
   const btnText = '▶ 開始上課'
 
-  const recentLogs = [...logs].slice(-4).reverse()
+  const recentLogs = [...logs].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 4)
 
   return (
     <div className={'student-card' + (open ? ' card-open' : '')}>
@@ -76,13 +79,14 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
             <div className="no-log">尚無上課紀錄</div>
           ) : (
             recentLogs.map(l => {
-              const isPay = l.isPay === true || l.isPay === 'true' || l.isPay === 'TRUE'
+              const computedCyclePos = cyclePosMap[l.session_number] ?? l.cyclePos
+              const isPay = computedCyclePos === 4
               return (
                 <div key={l.session_number} className="log-item">
                   <span className="log-num">{l.session_number}</span>
                   <span className="log-date">{formatDT(l.time)}</span>
                   <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
-                    {'第 ' + l.cyclePos + ' 堂'}
+                    {'第 ' + computedCyclePos + ' 堂'}
                   </span>
                 </div>
               )
