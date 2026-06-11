@@ -14,7 +14,7 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
   const showFeeSection = feeReceived ? isPayTime : !!lastPayLog
 
   const dotsFilled = isPayTime ? 4 : lastCyclePos
-  const btnClass = 'start-btn' + (isPayTime ? ' pay-mode' : '')
+  const btnClass = 'start-btn'
   const btnText = '▶ 開始上課'
 
   const recentLogs = [...logs].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 4)
@@ -42,7 +42,7 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
             {[1, 2, 3, 4].map(i => (
               <div
                 key={i}
-                className={'dot' + (isPayTime ? ' pay-alert' : i <= dotsFilled ? ' filled' : '')}
+                className={'dot' + (i <= dotsFilled ? ' filled' : '')}
               />
             ))}
           </div>
@@ -85,7 +85,7 @@ export default function StudentCard({ student, logs, onRecord, disabled, open, o
                 <div key={l.session_number} className="log-item">
                   <span className="log-num">{l.session_number}</span>
                   <span className="log-date">{formatDT(l.time)}</span>
-                  <span className={'log-badge ' + (isPay ? 'badge-pay' : 'badge-normal')}>
+                  <span className="log-badge badge-normal">
                     {'第 ' + computedCyclePos + ' 堂'}
                   </span>
                 </div>

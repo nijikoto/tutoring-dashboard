@@ -69,6 +69,8 @@ export default function App() {
     setStatus({ msg: '同步中...', type: '' })
     try {
       const data = await fetchData()
+      const validStudents = (data.students || []).filter(s => s.student_id)
+      data.students = validStudents
       const newLogs = {}
       data.students.forEach(s => { newLogs[s.student_id] = [] })
       ;(data.sessions || []).forEach(row => {
