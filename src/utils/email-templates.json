@@ -6,7 +6,7 @@
     },
     "english": {
       "subject": "[Tuition Payment] {name}",
-      "body": "Hi {name},\n\nWe have completed 4 lessons this cycle. Here is your tuition summary:\n\nLesson Dates:\n{dateLines}\n\nTuition Fee:\n  NT${price} × 4 lessons = NT${total}\n\nPlease arrange the payment at your earliest convenience.\nFeel free to reach out if you have any questions!\n\nBest regards,"
+      "body": "Hi {name},\n\nWe have completed 4 lessons this cycle. Here is your tuition summary:\n\nLesson Dates:\n{dateLines}\n\nTuition Fee:\n  NT${price} × 4 lessons = NT${total}\n\nThank you for your continued support!\nFeel free to reach out if you have any questions!\n\nBest regards,"
     }
   },
   "paymentReceived": {
