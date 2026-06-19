@@ -10,7 +10,13 @@
     }
   },
   "paymentReceived": {
-    "subject": "【日本語レッスン】ご入金を確認いたしました",
-    "body": "{name}さん\n\n授業料のお支払いを確認いたしました。\nありがとうございます。\n\nそれでは、次回のレッスンでお会いしましょう。\n\n羽含"
+    "japanese": {
+      "subject": "【日本語レッスン】ご入金を確認いたしました",
+      "body": "{name}さん\n\n授業料のお支払いを確認いたしました。\nありがとうございます。\n\nそれでは、次回のレッスンでお会いしましょう。\n\n羽含"
+    },
+    "english": {
+      "subject": "[English Lesson] Payment Received",
+      "body": "Hi {name},\n\nWe have received your payment. Much appreciated!\n\nSee you in class!\n\nBest regards,"
+    }
   }
 }

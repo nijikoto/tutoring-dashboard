@@ -5,7 +5,8 @@ function fill(str, vars) {
 }
 
 export function buildFeeReceivedEmail(student) {
-  const t = templates.paymentReceived
+  const isJapanese = student.course === '日文課'
+  const t = isJapanese ? templates.paymentReceived.japanese : templates.paymentReceived.english
   const vars = { name: student.name }
   return {
     subject: fill(t.subject, vars),
